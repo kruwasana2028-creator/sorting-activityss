@@ -47,7 +47,7 @@
         </div>
         <div class="col-span-2 md:col-span-1">
           <label class="block text-xs md:text-sm font-bold text-slate-700">ห้อง</label>
-          <input type="text" id="room" placeholder="ม.4/1" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+          <input type="text" id="room" placeholder="1" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
       </div>
 
@@ -68,7 +68,7 @@
       <div class="mb-10">
         <h2 class="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
           <span class="bg-blue-600 text-white rounded-full w-6 h-6 inline-flex items-center justify-center text-sm">1</span>
-          ตอนที่ 1: การเรียงข้อมูลแบบเลือก (Selection Sort) [คะแนนเต็ม 2.5]
+          ตอนที่ 1: การเรียงข้อมูลแบบเลือก (Selection Sort)
         </h2>
         <div class="overflow-x-auto rounded-xl border border-slate-300 shadow-sm">
           <table class="w-full min-w-[700px] border-collapse text-center text-sm">
@@ -171,7 +171,7 @@
       <div class="mb-8">
         <h2 class="text-lg font-bold text-emerald-800 mb-3 flex items-center gap-2">
           <span class="bg-emerald-600 text-white rounded-full w-6 h-6 inline-flex items-center justify-center text-sm">2</span>
-          ตอนที่ 2: การจัดเรียงแบบแทรก (Insertion Sort) [คะแนนเต็ม 2.5]
+          ตอนที่ 2: การจัดเรียงแบบแทรก (Insertion Sort)
         </h2>
         <div class="overflow-x-auto rounded-xl border border-slate-300 shadow-sm">
           <table class="w-full min-w-[700px] border-collapse text-center text-sm">
@@ -303,7 +303,7 @@
         const typeName = isSelection ? "ตอนที่ 1 (Selection Sort)" : "ตอนที่ 2 (Insertion Sort)";
         const rowName = input.closest('tr').querySelector('td').innerText;
         
-        alert(`❌ คำตอบไม่ถูกต้อง!\n📌 อยู่ใน: ${typeName}\n📝 แถว: ${rowName}\n\nกรุณาตรวจสอบการคำนวณและแก้ไขข้อผิดพลาดในกรอบสีแดงนะลูก!`);
+        alert(`❌ คำตอบไม่ถูกต้อง!\n📌 อยู่ใน: ${typeName}\n📝 แถว: ${rowName}\n\nกรุณาตรวจสอบการคำนวณและแก้ไขข้อผิดพลาดในกรอบสีแดง!`);
       }
       
       calculateTotalScore();
@@ -342,23 +342,97 @@
         score: calculateTotalScore()
       };
 
-      google.script.run
-        .withSuccessHandler(function(msg) {
-          alert("🎉 " + msg);
-          document.getElementById('activityForm').reset();
-          document.querySelectorAll('.quiz-input').forEach(el => {
-            el.classList.remove('input-error');
-          });
-          document.getElementById('displayScore').innerText = "0.00";
-          btn.disabled = false;
-          btn.innerText = "ส่งคำตอบบันทึกข้อมูลไปยัง Google Sheet";
-        })
-        .withFailureHandler(function(err) {
-          alert("เกิดข้อผิดพลาดในการส่งข้อมูล: " + err);
-          btn.disabled = false;
-          btn.innerText = "ส่งคำตอบบันทึกข้อมูลไปยัง Google Sheet";
-        })
-        .saveDataToSheet(studentData);
+    <script>
+    function checkAnswerRealTime(input) {
+      const userValue = input.value.trim();
+      const correctAnswer = input.getAttribute('data-ans');
+
+      if (userValue === '') {
+        input.classList.remove('input-error');
+        calculateTotalScore();
+        return;
+      }
+
+      if (userValue === correctAnswer) {
+        input.classList.remove('input-error');
+      } else {
+        input.classList.add('input-error');
+        
+        const table = input.closest('table');
+        const isSelection = table.querySelector('thead tr').classList.contains('bg-blue-600');
+        const typeName = isSelection ? "ตอนที่ 1 (Selection Sort)" : "ตอนที่ 2 (Insertion Sort)";
+        const rowName = input.closest('tr').querySelector('td').innerText;
+        
+        alert(`❌ คำตอบไม่ถูกต้อง!\n📌 อยู่ใน: ${typeName}\n📝 แถว: ${rowName}\n\nกรุณาตรวจสอบการคำนวณและแก้ไขข้อผิดพลาดในกรอบสีแดงนะลูก!`);
+      }
+      
+      calculateTotalScore();
+    }
+
+    function calculateTotalScore() {
+      const inputs = document.querySelectorAll('.quiz-input');
+      let totalFields = inputs.length;
+      let correctCount = 0;
+
+      inputs.forEach(input => {
+        if (input.value.trim() === input.getAttribute('data-ans')) {
+          correctCount++;
+        }
+      });
+
+      const finalScore = ((correctCount / totalFields) * 5).toFixed(2);
+      document.getElementById('displayScore').innerText = finalScore;
+      return finalScore;
+    }
+
+    // === ส่วนที่แก้ไขเพื่อเชื่อมต่อกับลิงก์ Web App ===
+    function handleSubmit(event) {
+      event.preventDefault();
+      
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerText = "กำลังบันทึกข้อมูล...";
+
+      // ดึงข้อมูลจากฟอร์มเตรียมส่ง
+      const studentData = {
+        studentId: document.getElementById('studentId').value,
+        fullName: document.getElementById('fullName').value,
+        no: document.getElementById('no').value,
+        section: document.getElementById('section').value,
+        room: document.getElementById('room').value,
+        activityType: "ทำครบทั้ง 2 ตอน (Selection & Insertion)",
+        score: calculateTotalScore()
+      };
+
+      // ลิงก์ Web App URL ของคุณ
+      const webAppUrl = "https://script.google.com/macros/s/AKfycbxyKVS3XGcoRsPB8Ak6q7nG5_tfftT8cR-G0KuxfLWjQy-4ucIYXhCDI09x7NlZrha2/exec";
+
+      // ส่งข้อมูลไปยัง Google Sheet โดยใช้ Fetch API (แปลง object เป็น URLSearchParams)
+      fetch(webAppUrl, {
+        method: "POST",
+        mode: "no-cors", // ใช้ no-cors เพื่อป้องกันปัญหา Cross-Origin จาก Google Apps Script
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams(studentData)
+      })
+      .then(() => {
+        // ทำงานเมื่อส่งข้อมูลสำเร็จ
+        alert("🎉 บันทึกข้อมูลและคะแนนไปยัง Google Sheet สำเร็จแล้วลูก!");
+        document.getElementById('activityForm').reset();
+        document.querySelectorAll('.quiz-input').forEach(el => {
+          el.classList.remove('input-error');
+        });
+        document.getElementById('displayScore').innerText = "0.00";
+        btn.disabled = false;
+        btn.innerText = "ส่งคำตอบบันทึกข้อมูล";
+      })
+      .catch(err => {
+        // ทำงานเมื่อเกิดข้อผิดพลาด
+        alert("เกิดข้อผิดพลาดในการส่งข้อมูล: " + err);
+        btn.disabled = false;
+        btn.innerText = "ส่งคำตอบบันทึกข้อมูล";
+      });
     }
   </script>
 </body>
