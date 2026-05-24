@@ -313,7 +313,7 @@
         const rowName = input.closest('tr').querySelector('td').innerText;
         
         // แสดงกล่องข้อความป๊อปอัพเตือนทันที
-        alert(`❌ คำตอบไม่ถูกต้องนะลูก!\n\n📌 อยู่ใน: ${typeName}\n📝 แถว: ${rowName}\n\n💡 กรุณาตรวจสอบการคำนวณใหม่อีกครั้ง และแก้ไขข้อผิดพลาดในช่องกรอบสีแดงนะครับ/ค่ะ`);
+        alert(`❌ คำตอบไม่ถูกต้องนะคะ!\n\n📌 อยู่ใน: ${typeName}\n📝 แถว: ${rowName}\n\n💡 กรุณาตรวจสอบการคำนวณใหม่อีกครั้ง และแก้ไขข้อผิดพลาดในช่องกรอบสีแดงนะคะ`);
       }
       
       // อัปเดตคะแนนรวมเรียลไทม์
@@ -364,19 +364,19 @@
         body: new URLSearchParams(studentData)
       })
       .then(() => {
-        alert("🎉 บันทึกข้อมูลและคะแนนไปยัง Google Sheet สำเร็จแล้วลูก!");
+        alert("🎉 บันทึกข้อมูลและคะแนนไปยัง Google Sheet สำเร็จแล้ว!");
         document.getElementById('activityForm').reset();
         document.querySelectorAll('.quiz-input').forEach(el => {
           el.classList.remove('input-error');
         });
         document.getElementById('displayScore').innerText = "0.00";
         btn.disabled = false;
-        btn.innerText = "ส่งคำตอบบันทึกข้อมูลไปยัง Google Sheet";
+        btn.innerText = "ส่งคำตอบบันทึกข้อมูล";
       })
       .catch(err => {
         alert("เกิดข้อผิดพลาดในการส่งข้อมูล: " + err);
         btn.disabled = false;
-        btn.innerText = "ส่งคำตอบบันทึกข้อมูลไปยัง Google Sheet";
+        btn.innerText = "ส่งคำตอบบันทึกข้อมูล";
       });
     }
   </script>
