@@ -287,25 +287,35 @@
       const userValue = input.value.trim();
       const correctAnswer = input.getAttribute('data-ans');
 
+      // ถ้ายังไม่ได้พิมพ์อะไร หรือลบออก ให้ล้างสถานะสีแดง แล้วคำนวณคะแนนใหม่
       if (userValue === '') {
         input.classList.remove('input-error');
         calculateTotalScore();
         return;
       }
 
+      // ตรวจสอบคำตอบ
       if (userValue === correctAnswer) {
+        // ถ้าถูก ให้เอาขอบสีแดงออก (ถ้าเคยมี)
         input.classList.remove('input-error');
       } else {
+        // ถ้าผิด ให้ใส่ขอบสีแดง
         input.classList.add('input-error');
         
+        // ค้นหาตารางที่ช่องนี้สังกัดอยู่ เพื่อเอามาเช็คว่าเป็น ตอนที่ 1 หรือ ตอนที่ 2
         const table = input.closest('table');
-        const isSelection = table.querySelector('thead tr').classList.contains('bg-blue-600');
-        const typeName = isSelection ? "ตอนที่ 1 (Selection Sort)" : "ตอนที่ 2 (Insertion Sort)";
+        // แก้ไขจุดนี้: เช็คคลาสที่แท็ก thead แทน เพื่อความแม่นยำในการแยกตอน
+        const thead = table.querySelector('thead');
+        const isSelection = thead.classList.contains('bg-blue-600');
+        
+        const typeName = isSelection ? "ตอนที่ 1: การเรียงข้อมูลแบบเลือก (Selection Sort)" : "ตอนที่ 2: การจัดเรียงแบบแทรก (Insertion Sort)";
         const rowName = input.closest('tr').querySelector('td').innerText;
         
-        alert(`❌ คำตอบไม่ถูกต้อง!\n📌 อยู่ใน: ${typeName}\n📝 แถว: ${rowName}\n\nกรุณาตรวจสอบการคำนวณและแก้ไขข้อผิดพลาดในกรอบสีแดง!`);
+        // แสดงกล่องข้อความป๊อปอัพเตือนทันที
+        alert(`❌ คำตอบไม่ถูกต้องนะลูก!\n\n📌 อยู่ใน: ${typeName}\n📝 แถว: ${rowName}\n\n💡 กรุณาตรวจสอบการคำนวณใหม่อีกครั้ง และแก้ไขข้อผิดพลาดในช่องกรอบสีแดงนะครับ/ค่ะ`);
       }
       
+      // อัปเดตคะแนนรวมเรียลไทม์
       calculateTotalScore();
     }
 
@@ -342,82 +352,17 @@
         score: calculateTotalScore()
       };
 
-    <script>
-    function checkAnswerRealTime(input) {
-      const userValue = input.value.trim();
-      const correctAnswer = input.getAttribute('data-ans');
-
-      if (userValue === '') {
-        input.classList.remove('input-error');
-        calculateTotalScore();
-        return;
-      }
-
-      if (userValue === correctAnswer) {
-        input.classList.remove('input-error');
-      } else {
-        input.classList.add('input-error');
-        
-        const table = input.closest('table');
-        const isSelection = table.querySelector('thead tr').classList.contains('bg-blue-600');
-        const typeName = isSelection ? "ตอนที่ 1 (Selection Sort)" : "ตอนที่ 2 (Insertion Sort)";
-        const rowName = input.closest('tr').querySelector('td').innerText;
-        
-        alert(`❌ คำตอบไม่ถูกต้อง!\n📌 อยู่ใน: ${typeName}\n📝 แถว: ${rowName}\n\nกรุณาตรวจสอบการคำนวณและแก้ไขข้อผิดพลาดในกรอบสีแดงนะลูก!`);
-      }
-      
-      calculateTotalScore();
-    }
-
-    function calculateTotalScore() {
-      const inputs = document.querySelectorAll('.quiz-input');
-      let totalFields = inputs.length;
-      let correctCount = 0;
-
-      inputs.forEach(input => {
-        if (input.value.trim() === input.getAttribute('data-ans')) {
-          correctCount++;
-        }
-      });
-
-      const finalScore = ((correctCount / totalFields) * 5).toFixed(2);
-      document.getElementById('displayScore').innerText = finalScore;
-      return finalScore;
-    }
-
-    // === ส่วนที่แก้ไขเพื่อเชื่อมต่อกับลิงก์ Web App ===
-    function handleSubmit(event) {
-      event.preventDefault();
-      
-      const btn = document.getElementById('submitBtn');
-      btn.disabled = true;
-      btn.innerText = "กำลังบันทึกข้อมูล...";
-
-      // ดึงข้อมูลจากฟอร์มเตรียมส่ง
-      const studentData = {
-        studentId: document.getElementById('studentId').value,
-        fullName: document.getElementById('fullName').value,
-        no: document.getElementById('no').value,
-        section: document.getElementById('section').value,
-        room: document.getElementById('room').value,
-        activityType: "ทำครบทั้ง 2 ตอน (Selection & Insertion)",
-        score: calculateTotalScore()
-      };
-
-      // ลิงก์ Web App URL ของคุณ
       const webAppUrl = "https://script.google.com/macros/s/AKfycbxyKVS3XGcoRsPB8Ak6q7nG5_tfftT8cR-G0KuxfLWjQy-4ucIYXhCDI09x7NlZrha2/exec";
 
-      // ส่งข้อมูลไปยัง Google Sheet โดยใช้ Fetch API (แปลง object เป็น URLSearchParams)
       fetch(webAppUrl, {
         method: "POST",
-        mode: "no-cors", // ใช้ no-cors เพื่อป้องกันปัญหา Cross-Origin จาก Google Apps Script
+        mode: "no-cors",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
         },
         body: new URLSearchParams(studentData)
       })
       .then(() => {
-        // ทำงานเมื่อส่งข้อมูลสำเร็จ
         alert("🎉 บันทึกข้อมูลและคะแนนไปยัง Google Sheet สำเร็จแล้วลูก!");
         document.getElementById('activityForm').reset();
         document.querySelectorAll('.quiz-input').forEach(el => {
@@ -425,13 +370,12 @@
         });
         document.getElementById('displayScore').innerText = "0.00";
         btn.disabled = false;
-        btn.innerText = "ส่งคำตอบบันทึกข้อมูล";
+        btn.innerText = "ส่งคำตอบบันทึกข้อมูลไปยัง Google Sheet";
       })
       .catch(err => {
-        // ทำงานเมื่อเกิดข้อผิดพลาด
         alert("เกิดข้อผิดพลาดในการส่งข้อมูล: " + err);
         btn.disabled = false;
-        btn.innerText = "ส่งคำตอบบันทึกข้อมูล";
+        btn.innerText = "ส่งคำตอบบันทึกข้อมูลไปยัง Google Sheet";
       });
     }
   </script>
