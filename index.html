@@ -364,7 +364,7 @@
         body: new URLSearchParams(studentData)
       })
       .then(() => {
-        alert("🎉 บันทึกข้อมูลและคะแนนไปยัง Google Sheet สำเร็จแล้ว!");
+        alert("🎉 บันทึกข้อมูลและคะแนนสำเร็จแล้ว!");
         document.getElementById('activityForm').reset();
         document.querySelectorAll('.quiz-input').forEach(el => {
           el.classList.remove('input-error');
