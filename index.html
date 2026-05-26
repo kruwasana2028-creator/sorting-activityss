@@ -360,31 +360,89 @@
         score: calculateTotalScore()
       };
 
-      const webAppUrl = "https://script.google.com/macros/s/AKfycbyuJXgvTIbHNc-5tCDTIlHHd9yRCTH3Q1M5cDLUGJeHNadBgZwEqWs28AAK20CBQLAk/exec";
+     <script>
+    // ⚠️ นำ URL เว็บแอปที่ได้จาก Google Apps Script มาวางในเครื่องหมายอัญประกาศด้านล่างนี้
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwn8hfHhauEH2xqmBWBt8-HFO0urN43cQ2gZSmUu4U_c60HnEX110WNNb3-BaBbVkLdZA/exec";
 
-      fetch(webAppUrl, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: new URLSearchParams(studentData)
-      })
-      .then(() => {
-        alert("🎉 บันทึกข้อมูลและคะแนนสำเร็จแล้ว!");
-        document.getElementById('activityForm').reset();
-        document.querySelectorAll('.quiz-input').forEach(el => {
-          el.classList.remove('input-error');
+    function checkAnswerRealTime(input) {
+      const userValue = input.value.trim();
+      const correctAnswer = input.getAttribute('data-ans');
+
+      if (userValue === '') {
+        input.classList.remove('input-error');
+        return;
+      }
+
+      if (userValue === correctAnswer) {
+        input.classList.remove('input-error');
+      } else {
+        input.classList.add('input-error');
+        
+        const table = input.closest('table');
+        const thead = table.querySelector('thead');
+        const isSelection = thead.classList.contains('bg-blue-600');
+        
+        const typeName = isSelection ? "ตอนที่ 1: การเรียงข้อมูลแบบเลือก (Selection Sort)" : "ตอนที่ 2: การจัดเรียงแบบแทรก (Insertion Sort)";
+        const rowName = input.closest('tr').querySelector('td').innerText;
+        
+        alert(`❌ คำตอบไม่ถูกต้องนะคะ!\n\n📌 อยู่ใน${typeName}\n🔎 ${rowName}\n\nลองทบทวนขั้นตอนการจัดเรียงอีกครั้งนะคะ สู้ๆ!`);
+      }
+    }
+
+    async function handleSubmit(event) {
+      event.preventDefault();
+
+      // 1. ตรวจสอบว่ายังมีจุดที่ตอบผิดค้างอยู่หรือไม่
+      const errors = document.querySelectorAll('.input-error');
+      if (errors.length > 0) {
+        alert('⚠️ ไม่สามารถส่งงานได้: เนื่องจากยังมีข้อที่ตอบไม่ถูกต้อง กรุณาตรวจสอบและแก้ไขให้ถูกต้องก่อนค่ะ');
+        return;
+      }
+
+      // เปลี่ยนสถานะปุ่มส่งงานเพื่อป้องกันการกดซ้ำ
+      const submitBtn = document.getElementById('submitBtn');
+      const originalBtnText = submitBtn.innerText;
+      submitBtn.disabled = true;
+      submitBtn.innerText = "⏳ กำลังบันทึกข้อมูล กรุณารอสักครู่...";
+      submitBtn.classList.add('bg-slate-400', 'cursor-not-allowed');
+      submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+
+      // 2. รวบรวมข้อมูลส่วนตัวจากฟอร์ม
+      const studentData = {
+        studentId: document.getElementById('studentId').value,
+        title: document.getElementById('title').value,
+        fullName: document.getElementById('fullName').value,
+        no: document.getElementById('no').value,
+        section: document.getElementById('section').value,
+        room: document.getElementById('room').value
+      };
+
+      // 3. จัดส่งข้อมูลไปยัง Google Apps Script Web App ด้วยวิธี Fetch API
+      try {
+        const response = await fetch(WEB_APP_URL, {
+          method: 'POST',
+          mode: 'no-cors', // ตั้งค่าโหมดเพื่อเลี่ยงปัญหา CORS บนเว็บบราวเซอร์พื้นฐาน
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(studentData)
         });
-        document.getElementById('displayScore').innerText = "0.00";
-        btn.disabled = false;
-        btn.innerText = "ส่งคำตอบบันทึกข้อมูล";
-      })
-      .catch(err => {
-        alert("เกิดข้อผิดพลาดในการส่งข้อมูล: " + err);
-        btn.disabled = false;
-        btn.innerText = "ส่งคำตอบบันทึกข้อมูล";
-      });
+
+        // เนื่องจากการใช้โหมด no-cors จะไม่สามารถอ่านค่า response ตรงๆ ได้ 
+        // แต่ถ้าทำงานมาถึงบรรทัดนี้ได้แสดงว่าเครือข่ายส่งข้อมูลสำเร็จแล้ว
+        alert(`🎉 บันทึกข้อมูลสำเร็จ! \n\nคุณครูได้รับผลงานของ ${studentData.title}${studentData.fullName} เลขที่ ${studentData.no} ชั้น ม.${studentData.room}/${studentData.section} เรียบร้อยแล้วค่ะ`);
+        document.getElementById('activityForm').reset(); // ล้างฟอร์มเมื่อส่งสำเร็จ
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('❌ เกิดข้อผิดพลาดในระบบส่งข้อมูล: กรุณาติดต่อคุณครูผู้สอน หรือลองใหม่อีกครั้งนะคะ');
+      } finally {
+        // คืนค่าปุ่มส่งงานกลับมาเป็นปกติ
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalBtnText;
+        submitBtn.classList.remove('bg-slate-400', 'cursor-not-allowed');
+        submitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+      }
     }
   </script>
 </body>
