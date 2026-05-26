@@ -28,38 +28,38 @@
 
     <form id="activityForm" onsubmit="handleSubmit(event)">
       
-     <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8 bg-slate-50 p-4 rounded-xl border border-slate-200">
-  <div>
-    <label class="block text-xs md:text-sm font-bold text-slate-700">เลขประจำตัว</label>
-    <input type="text" id="studentId" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-  </div>
-  
-  <div>
-    <label class="block text-xs md:text-sm font-bold text-slate-700">คำนำหน้าชื่อ</label>
-    <select id="title" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-      <option value="" disabled selected>เลือก...</option>
-      <option value="นาย">นาย</option>
-      <option value="นางสาว">นางสาว</option>
-    </select>
-  </div>
-  
-  <div>
-    <label class="block text-xs md:text-sm font-bold text-slate-700">ชื่อ-นามสกุล</label>
-    <input type="text" id="fullName" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-  </div>
-  <div>
-    <label class="block text-xs md:text-sm font-bold text-slate-700">เลขที่</label>
-    <input type="number" id="no" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-  </div>
-  <div>
-    <label class="block text-xs md:text-sm font-bold text-slate-700">ตอน (ก,ข)</label>
-    <input type="text" id="section" placeholder="ก หรือ ข" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-  </div>
-  <div class="col-span-2 md:col-span-1">
-    <label class="block text-xs md:text-sm font-bold text-slate-700">ห้อง</label>
-    <input type="text" id="room" placeholder="1" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-  </div>
-</div>
+      <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8 bg-slate-50 p-4 rounded-xl border border-slate-200">
+        <div>
+          <label class="block text-xs md:text-sm font-bold text-slate-700">เลขประจำตัว</label>
+          <input type="text" id="studentId" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        
+        <div>
+          <label class="block text-xs md:text-sm font-bold text-slate-700">คำนำหน้าชื่อ</label>
+          <select id="title" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="" disabled selected>เลือก...</option>
+            <option value="นาย">นาย</option>
+            <option value="นางสาว">นางสาว</option>
+          </select>
+        </div>
+        
+        <div>
+          <label class="block text-xs md:text-sm font-bold text-slate-700">ชื่อ-นามสกุล</label>
+          <input type="text" id="fullName" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs md:text-sm font-bold text-slate-700">เลขที่</label>
+          <input type="number" id="no" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs md:text-sm font-bold text-slate-700">ตอน (ก,ข)</label>
+          <input type="text" id="section" placeholder="ก หรือ ข" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div class="col-span-2 md:col-span-1">
+          <label class="block text-xs md:text-sm font-bold text-slate-700">ห้อง</label>
+          <input type="text" id="room" placeholder="1" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+      </div>
 
       <div class="mb-6 bg-blue-50 p-4 rounded-xl border border-blue-200">
         <span class="font-bold text-blue-900 text-sm md:text-base">🔢 ข้อมูลชุดตัวเลขเริ่มต้น:</span>
@@ -82,8 +82,8 @@
         </h2>
         <div class="overflow-x-auto rounded-xl border border-slate-300 shadow-sm">
           <table class="w-full min-w-[700px] border-collapse text-center text-sm">
-            <thead>
-              <tr class="bg-blue-600 text-white font-medium">
+            <thead class="bg-blue-600 text-white font-medium">
+              <tr>
                 <th class="p-2 border border-blue-700 w-20">รอบที่</th>
                 <th class="p-2 border border-blue-700">ดัชนี 0</th>
                 <th class="p-2 border border-blue-700">ดัชนี 1</th>
@@ -185,8 +185,8 @@
         </h2>
         <div class="overflow-x-auto rounded-xl border border-slate-300 shadow-sm">
           <table class="w-full min-w-[700px] border-collapse text-center text-sm">
-            <thead>
-              <tr class="bg-emerald-600 text-white font-medium">
+            <thead class="bg-emerald-600 text-white font-medium">
+              <tr>
                 <th class="p-2 border border-emerald-700 w-20">รอบที่</th>
                 <th class="p-2 border border-emerald-700">ดัชนี 0</th>
                 <th class="p-2 border border-emerald-700">ดัชนี 1</th>
@@ -291,158 +291,109 @@
   </div>
 
   <script>
+    // 1. ฟังก์ชันตรวจสอบคำตอบเรียลไทม์
     function checkAnswerRealTime(input) {
       const userValue = input.value.trim();
       const correctAnswer = input.getAttribute('data-ans');
 
-      // ถ้ายังไม่ได้พิมพ์อะไร หรือลบออก ให้ล้างสถานะสีแดง แล้วคำนวณคะแนนใหม่
       if (userValue === '') {
         input.classList.remove('input-error');
-        calculateTotalScore();
         return;
       }
 
-      // ตรวจสอบคำตอบ
       if (userValue === correctAnswer) {
-        // ถ้าถูก ให้เอาขอบสีแดงออก (ถ้าเคยมี)
         input.classList.remove('input-error');
       } else {
-        // ถ้าผิด ให้ใส่ขอบสีแดง
         input.classList.add('input-error');
         
-        // ค้นหาตารางที่ช่องนี้สังกัดอยู่ เพื่อเอามาเช็คว่าเป็น ตอนที่ 1 หรือ ตอนที่ 2
         const table = input.closest('table');
-        // แก้ไขจุดนี้: เช็คคลาสที่แท็ก thead แทน เพื่อความแม่นยำในการแยกตอน
         const thead = table.querySelector('thead');
         const isSelection = thead.classList.contains('bg-blue-600');
         
         const typeName = isSelection ? "ตอนที่ 1: การเรียงข้อมูลแบบเลือก (Selection Sort)" : "ตอนที่ 2: การจัดเรียงแบบแทรก (Insertion Sort)";
         const rowName = input.closest('tr').querySelector('td').innerText;
         
-        // แสดงกล่องข้อความป๊อปอัพเตือนทันที
-        alert(`❌ คำตอบไม่ถูกต้องนะคะ!\n\n📌 อยู่ใน: ${typeName}\n📝 แถว: ${rowName}\n\n💡 กรุณาตรวจสอบการคำนวณใหม่อีกครั้ง และแก้ไขข้อผิดพลาดในช่องกรอบสีแดงนะคะ`);
+        alert(`❌ คำตอบไม่ถูกต้องนะคะ!\n\n📌 ตำแหน่ง: ${typeName}\n📌 ${rowName}\n\nลองทบทวนหลักการจัดเรียงแล้วแก้คำตอบอีกครั้งนะคะ ✌️`);
       }
-      
-      // อัปเดตคะแนนรวมเรียลไทม์
-      calculateTotalScore();
     }
 
+    // 2. ฟังก์ชันคำนวณคะแนนรวมทั้งหมด
     function calculateTotalScore() {
       const inputs = document.querySelectorAll('.quiz-input');
-      let totalFields = inputs.length;
-      let correctCount = 0;
-
+      let score = 0;
       inputs.forEach(input => {
         if (input.value.trim() === input.getAttribute('data-ans')) {
-          correctCount++;
+          score++;
         }
       });
-
-      const finalScore = ((correctCount / totalFields) * 5).toFixed(2);
-      document.getElementById('displayScore').innerText = finalScore;
-      return finalScore;
+      return score;
     }
 
+    // 3. ฟังก์ชันการส่งฟอร์มเพื่อบันทึกข้อมูลลง Google Sheets
     function handleSubmit(event) {
-      event.preventDefault();
-      
-      const btn = document.getElementById('submitBtn');
-      btn.disabled = true;
-      btn.innerText = "กำลังบันทึกข้อมูล...";
+      event.preventDefault(); // ป้องกันหน้าเว็บบราวเซอร์โหลดใหม่
 
-      const studentData = {
-        studentId: document.getElementById('studentId').value,
-        fullName: document.getElementById('fullName').value,
-        no: document.getElementById('no').value,
-        section: document.getElementById('section').value,
-        room: document.getElementById('room').value,
-        activityType: "ทำครบทั้ง 2 ตอน (Selection & Insertion)",
-        score: calculateTotalScore()
-      };
-
-     <script>
-    // ⚠️ นำ URL เว็บแอปที่ได้จาก Google Apps Script มาวางในเครื่องหมายอัญประกาศด้านล่างนี้
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwn8hfHhauEH2xqmBWBt8-HFO0urN43cQ2gZSmUu4U_c60HnEX110WNNb3-BaBbVkLdZA/exec";
-
-    function checkAnswerRealTime(input) {
-      const userValue = input.value.trim();
-      const correctAnswer = input.getAttribute('data-ans');
-
-      if (userValue === '') {
-        input.classList.remove('input-error');
+      // 🛑 ตรวจสอบว่ายังมีข้อที่นักเรียนตอบผิด (ขอบสีแดง) หลงเหลืออยู่หรือไม่
+      const hasErrors = document.querySelectorAll('.input-error').length > 0;
+      if (hasErrors) {
+        alert('⚠️ ไม่สามารถส่งงานได้: กรุณาแก้ไขช่องที่ยังตอบผิด (ขอบสีแดง) ให้ถูกต้องก่อนนะคะ!');
         return;
       }
 
-      if (userValue === correctAnswer) {
-        input.classList.remove('input-error');
-      } else {
-        input.classList.add('input-error');
-        
-        const table = input.closest('table');
-        const thead = table.querySelector('thead');
-        const isSelection = thead.classList.contains('bg-blue-600');
-        
-        const typeName = isSelection ? "ตอนที่ 1: การเรียงข้อมูลแบบเลือก (Selection Sort)" : "ตอนที่ 2: การจัดเรียงแบบแทรก (Insertion Sort)";
-        const rowName = input.closest('tr').querySelector('td').innerText;
-        
-        alert(`❌ คำตอบไม่ถูกต้องนะคะ!\n\n📌 อยู่ใน${typeName}\n🔎 ${rowName}\n\nลองทบทวนขั้นตอนการจัดเรียงอีกครั้งนะคะ สู้ๆ!`);
-      }
-    }
+      // คำนวณคะแนนรวม
+      const totalInputs = document.querySelectorAll('.quiz-input').length;
+      const finalScore = calculateTotalScore();
 
-    async function handleSubmit(event) {
-      event.preventDefault();
-
-      // 1. ตรวจสอบว่ายังมีจุดที่ตอบผิดค้างอยู่หรือไม่
-      const errors = document.querySelectorAll('.input-error');
-      if (errors.length > 0) {
-        alert('⚠️ ไม่สามารถส่งงานได้: เนื่องจากยังมีข้อที่ตอบไม่ถูกต้อง กรุณาตรวจสอบและแก้ไขให้ถูกต้องก่อนค่ะ');
-        return;
-      }
-
-      // เปลี่ยนสถานะปุ่มส่งงานเพื่อป้องกันการกดซ้ำ
+      // เปลี่ยนสถานะปุ่มส่ง เพื่อแสดงความคืบหน้าให้ผู้ใช้ทราบและป้องกันการกดเบิ้ล
       const submitBtn = document.getElementById('submitBtn');
-      const originalBtnText = submitBtn.innerText;
       submitBtn.disabled = true;
-      submitBtn.innerText = "⏳ กำลังบันทึกข้อมูล กรุณารอสักครู่...";
-      submitBtn.classList.add('bg-slate-400', 'cursor-not-allowed');
-      submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+      submitBtn.innerText = '⏳ กำลังบันทึกข้อมูลลง Google Sheets...';
+      submitBtn.className = "w-full sm:w-auto bg-slate-400 text-white font-bold py-3 px-12 rounded-lg shadow-md cursor-not-allowed text-center";
 
-      // 2. รวบรวมข้อมูลส่วนตัวจากฟอร์ม
-      const studentData = {
-        studentId: document.getElementById('studentId').value,
-        title: document.getElementById('title').value,
-        fullName: document.getElementById('fullName').value,
-        no: document.getElementById('no').value,
-        section: document.getElementById('section').value,
-        room: document.getElementById('room').value
-      };
+      // ⚙️ [สำคัญ] ใส่ลิงก์ Webhook URL (Google Apps Script) ของคุณครูตรงนี้
+      const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxuRLkUahKUY4urBPRotFzbZfro4D025OCpvjlzkg7POvV1g4AajxXPjRuipDw9stGQFg/exec'; 
 
-      // 3. จัดส่งข้อมูลไปยัง Google Apps Script Web App ด้วยวิธี Fetch API
-      try {
-        const response = await fetch(WEB_APP_URL, {
-          method: 'POST',
-          mode: 'no-cors', // ตั้งค่าโหมดเพื่อเลี่ยงปัญหา CORS บนเว็บบราวเซอร์พื้นฐาน
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(studentData)
-        });
+      // ทำการจัดฟอร์แมตข้อมูลส่งผ่าน URL-encoded เพื่อให้เข้ากันได้ดีกับฝั่ง Google Apps Script โดยไม่มีปัญหา CORS
+      const formData = new URLSearchParams();
+      formData.append('studentId', document.getElementById('studentId').value.trim());
+      formData.append('title', document.getElementById('title').value);
+      formData.append('fullName', document.getElementById('fullName').value.trim());
+      formData.append('no', document.getElementById('no').value);
+      formData.append('section', document.getElementById('section').value.trim());
+      formData.append('room', document.getElementById('room').value.trim());
+      formData.append('score', finalScore);
+      formData.append('maxScore', totalInputs);
 
-        // เนื่องจากการใช้โหมด no-cors จะไม่สามารถอ่านค่า response ตรงๆ ได้ 
-        // แต่ถ้าทำงานมาถึงบรรทัดนี้ได้แสดงว่าเครือข่ายส่งข้อมูลสำเร็จแล้ว
-        alert(`🎉 บันทึกข้อมูลสำเร็จ! \n\nคุณครูได้รับผลงานของ ${studentData.title}${studentData.fullName} เลขที่ ${studentData.no} ชั้น ม.${studentData.room}/${studentData.section} เรียบร้อยแล้วค่ะ`);
-        document.getElementById('activityForm').reset(); // ล้างฟอร์มเมื่อส่งสำเร็จ
-
-      } catch (error) {
+      // ส่งข้อมูลทางไกลไปเก็บที่ Google Sheets
+      fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: formData.toString()
+      })
+      .then(response => {
+        if (response.ok) {
+          // 🎉 แจ้งเตือนเมื่อข้อมูลถูกบันทึกสำเร็จ
+          alert(`🎉 ระบบได้บันทึกข้อมูลของคุณลง Google Sheets สำเร็จแล้วค่ะ!\n\n👤 ผู้ส่ง: ${document.getElementById('title').value}${document.getElementById('fullName').value.trim()}\n💯 ได้คะแนน: ${finalScore} / ${totalInputs} คะแนน`);
+          
+          // ล้างฟอร์มคำตอบทั้งหมดหลังส่งเสร็จเพื่อให้พร้อมสำหรับคนต่อไป
+          document.getElementById('activityForm').reset();
+          document.querySelectorAll('.quiz-input').forEach(input => input.classList.remove('input-error'));
+        } else {
+          throw new Error('Network response was not ok.');
+        }
+      })
+      .catch(error => {
         console.error('Error:', error);
-        alert('❌ เกิดข้อผิดพลาดในระบบส่งข้อมูล: กรุณาติดต่อคุณครูผู้สอน หรือลองใหม่อีกครั้งนะคะ');
-      } finally {
-        // คืนค่าปุ่มส่งงานกลับมาเป็นปกติ
+        alert('❌ เกิดข้อผิดพลาดทางเทคนิคในการเชื่อมต่อ Google Sheets กรุณาลองใหม่อีกครั้ง หรือติดต่อครูผู้สอนค่ะ');
+      })
+      .finally(() => {
+        // คืนค่าปุ่มกลับสู่สภาวะปกติ
         submitBtn.disabled = false;
-        submitBtn.innerText = originalBtnText;
-        submitBtn.classList.remove('bg-slate-400', 'cursor-not-allowed');
-        submitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-      }
+        submitBtn.innerText = 'ส่งคำตอบบันทึกข้อมูล';
+        submitBtn.className = "w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-12 rounded-lg shadow-md transition-all cursor-pointer text-center";
+      });
     }
   </script>
 </body>
