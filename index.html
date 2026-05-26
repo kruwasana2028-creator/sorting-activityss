@@ -372,7 +372,7 @@
       .then(response => {
         if (response.ok) {
           // 🎉 แจ้งเตือนเมื่อข้อมูลถูกบันทึกสำเร็จ (แสดงแบบ 5 คะแนนเต็มเช่นกัน)
-          alert(`🎉 ระบบได้บันทึกข้อมูลของคุณลง Google Sheets สำเร็จแล้วค่ะ!\n\n👤 ผู้ส่ง: ${document.getElementById('title').value}${document.getElementById('fullName').value.trim()}\n💯 ได้คะแนน: ${finalScoreScaled} / ${maxScoreTarget} คะแนน`);
+          alert(`🎉 ระบบได้บันทึกข้อมูลลงระบบสำเร็จแล้วค่ะ!\n\n👤 ผู้ส่ง: ${document.getElementById('title').value}${document.getElementById('fullName').value.trim()}\n💯 ได้คะแนน: ${finalScoreScaled} / ${maxScoreTarget} คะแนน`);
           
           document.getElementById('activityForm').reset();
           document.querySelectorAll('.quiz-input').forEach(input => input.classList.remove('input-error'));
