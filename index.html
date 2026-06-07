@@ -24,7 +24,6 @@
 </head>
 <body class="bg-slate-100 text-slate-800 p-3 md:p-6 select-none">
 
-  <!-- กล่องแสดงตัวจับเวลา (จะซ่อนไว้ตอนแรก และแสดงเมื่อเริ่มทำ) -->
   <div id="timerContainer" class="hidden fixed top-4 right-4 z-50 bg-slate-950 text-white font-mono px-4 py-2.5 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-bounce">
     <span class="text-xl">⏱️</span>
     <span id="timerDisplay" class="text-lg font-bold">00:00</span>
@@ -39,7 +38,6 @@
 
     <form id="activityForm" onsubmit="handleSubmit(event)">
       
-      <!-- ข้อมูลผู้เรียน -->
       <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
         <div>
           <label class="block text-xs md:text-sm font-bold text-slate-700">เลขประจำตัว</label>
@@ -73,7 +71,6 @@
         </div>
       </div>
 
-      <!-- กล่องคำชี้แจงเกณฑ์เวลา -->
       <div class="mb-6 bg-amber-50 border border-amber-300 rounded-xl p-4 text-sm">
         <h3 class="font-bold text-amber-900 flex items-center gap-2 mb-2 text-base">
           ⏱️ เกณฑ์การจับเวลาและการหักคะแนนสุทธิ
@@ -91,11 +88,11 @@
             <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-red-800 font-bold">25 นาที</span> : <span class="bg-red-200 px-1.5 py-0.5 rounded text-red-900">-5 คะแนน (สูงสุด)</span></li>
           </ul>
         </div>
-        <p class="text-red-600 mt-3 font-bold">❌ ข้อควรระวัง: ห้ามกดสลับแท็บ ย่อหน้าต่าง หรือเปิดโปรแกรมอื่นขณะทำกิจกรรม มิฉะนั้นระบบจะทำการบันทึกและขึ้นเตือนพฤทีตกรรมทันที!</p>
+        <p class="text-red-600 mt-3 font-bold">❌ ข้อควรระวัง: ห้ามกดสลับแท็บ ย่อหน้าต่าง หรือเปิดโปรแกรมอื่นขณะทำกิจกรรม มิฉะนั้นระบบจะทำการบันทึกและขึ้นเตือนพฤติกรรมทันที!</p>
       </div>
 
       <div class="mb-6 bg-blue-50 p-4 rounded-xl border border-blue-200">
-        <span class="font-bold text-blue-900 text-sm md:text-base">🔢 ข้อมูลชุดตัวเลขเริ่มต้น:จัดเรียงข้อมูลน้อยไปหามาก</span>
+        <span class="font-bold text-blue-900 text-sm md:text-base">🔢 ข้อมูลชุดตัวเลขเริ่มต้น:เรียงจากน้อยไปหามาก</span>
         <div class="flex flex-wrap gap-2 mt-2">
           <span class="px-3 py-1.5 bg-white border border-blue-300 rounded font-bold text-slate-700">35</span>
           <span class="px-3 py-1.5 bg-white border border-blue-300 rounded font-bold text-slate-700">67</span>
@@ -108,7 +105,6 @@
         </div>
       </div>
 
-      <!-- ตอนที่ 1 -->
       <div class="mb-10">
         <h2 class="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
           <span class="bg-blue-600 text-white rounded-full w-6 h-6 inline-flex items-center justify-center text-sm">1</span>
@@ -212,7 +208,6 @@
         </div>
       </div>
 
-      <!-- ตอนที่ 2 -->
       <div class="mb-8">
         <h2 class="text-lg font-bold text-emerald-800 mb-3 flex items-center gap-2">
           <span class="bg-emerald-600 text-white rounded-full w-6 h-6 inline-flex items-center justify-center text-sm">2</span>
@@ -286,7 +281,7 @@
                 <td class="p-1 border"><input type="number" data-ans="58" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
                 <td class="p-1 border"><input type="number" data-ans="67" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
                 <td class="p-1 border"><input type="number" data-ans="99" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="82" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="82" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
                 <td class="p-1 border"><input type="number" data-ans="43" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
               </tr>
               <tr>
@@ -316,7 +311,6 @@
         </div>
       </div>
 
-      <!-- ปุ่มส่งคำตอบ -->
       <div class="flex justify-center items-center bg-slate-50 border p-4 rounded-xl">
         <button type="submit" id="submitBtn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-12 rounded-lg shadow-md transition-all cursor-pointer text-center">
           ส่งคำตอบบันทึกข้อมูล
@@ -327,12 +321,15 @@
   </div>
 
   <script>
+    // 🔴 ส่วนสำคัญ: วางลิงก์ Web App URL ที่ได้จาก Google Apps Script ที่นี่
+    const WEB_APP_URL = "🔴_กรุณาเอาลิงก์_WEB_APP_URL_มาใส่ตรงนี้_🔴";
+
     let timerStarted = false;
     let startTime = null;
     let timerInterval = null;
     let cheatCount = 0;
 
-    // ส่วนที่แก้ไข: เพิ่มกล่องข้อความป๊อปอัพแจ้งเมื่อกรอกข้อมูลผิดพลาด
+    // ฟังก์ชันตรวจสอบข้อผิดพลาดแบบ Real-time พร้อมแสดงป๊อปอัพ
     function checkAnswerRealTime(input) {
       const userValue = input.value.trim();
       const correctAnswer = input.getAttribute('data-ans');
@@ -388,6 +385,9 @@
 
     function handleSubmit(event) {
       event.preventDefault();
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = "⏳ กำลังบันทึกข้อมูลลงฐานข้อมูล...";
 
       const inputs = document.querySelectorAll('.quiz-input');
       let totalQuestions = inputs.length;
@@ -408,6 +408,7 @@
         const timeDiffInSeconds = Math.floor((endTime - startTime) / 1000);
         minutesUsed = timeDiffInSeconds / 60;
 
+        // คำนวณเกณฑ์หักคะแนนตามข้อกำหนด
         if (minutesUsed >= 25) {
           penalty = 5;
         } else if (minutesUsed >= 23) {
@@ -426,24 +427,47 @@
       let finalScore = Math.max(0, correctAnswers - penalty);
       let timeString = timerStarted ? `${Math.floor(minutesUsed)} นาที ${Math.floor((minutesUsed % 1) * 60)} วินาที` : "ไม่ได้เริ่มทำในตาราง";
       
-      let resultMessage = `🎉 บันทึกข้อมูลสำเร็จ!\n\n` +
-                          `📝 ตอบถูกทั้งหมด: ${correctAnswers} จาก ${totalQuestions} ช่อง\n` +
-                          `⏱️ เวลาที่ใช้ไป: ${timeString}\n` +
-                          `📉 ถูกหักคะแนนจากเวลา: -${penalty} คะแนน\n` +
-                          `📊 คะแนนสุทธิที่ได้: ${finalScore} คะแนน\n\n`;
-      
-      if (cheatCount > 0) {
-        resultMessage += `⚠️ หมายเหตุ: พบการเปลี่ยนแท็บ/ออกจากหน้าจอจำนวน ${cheatCount} ครั้ง`;
-      }
-
-      alert(resultMessage);
-
-      console.log({
+      // จัดเตรียมข้อมูลส่งไปที่ Google Sheets
+      const formData = {
         studentId: document.getElementById('studentId').value,
+        title: document.getElementById('title').value,
         fullName: document.getElementById('fullName').value,
-        score: finalScore,
+        no: document.getElementById('no').value,
+        section: document.getElementById('section').value,
+        room: document.getElementById('room').value,
+        correctAnswers: correctAnswers,
+        penalty: penalty,
+        finalScore: finalScore,
         timeUsed: timeString,
         cheats: cheatCount
+      };
+
+      // ส่งข้อมูลทางไกลไปเก็บที่ Google Sheets
+      fetch(WEB_APP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      })
+      .then(() => {
+        let resultMessage = `🎉 บันทึกข้อมูลลง Google Sheet สำเร็จ!\n\n` +
+                            `📝 ตอบถูกทั้งหมด: ${correctAnswers} จาก ${totalQuestions} ช่อง\n` +
+                            `⏱️ เวลาที่ใช้ไป: ${timeString}\n` +
+                            `📉 ถูกหักคะแนนจากเวลา: -${penalty} คะแนน\n` +
+                            `📊 คะแนนสุทธิที่ได้: ${finalScore} คะแนน\n\n`;
+        
+        if (cheatCount > 0) {
+          resultMessage += `⚠️ หมายเหตุ: พบการเปลี่ยนแท็บ/ออกจากหน้าจอจำนวน ${cheatCount} ครั้ง`;
+        }
+
+        alert(resultMessage);
+        submitBtn.innerText = "✅ ส่งข้อมูลเรียบร้อยแล้ว";
+      })
+      .catch(error => {
+        alert("❌ เกิดข้อผิดพลาดในการส่งข้อมูลเข้าสู่คลาวด์ กรุณาแจ้งครูผู้สอนหรือบันทึกภาพหน้าจอผลลัพธ์นี้ไว้ครับ");
+        console.error(error);
+        submitBtn.disabled = false;
+        submitBtn.innerText = "ส่งคำตอบบันทึกข้อมูล";
       });
     }
   </script>
