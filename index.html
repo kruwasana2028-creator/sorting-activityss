@@ -15,20 +15,32 @@
     
     /* สีไฮไลท์สีเขียวตามไฟล์ Excel ต้นฉบับ */
     .excel-green { background-color: #c6efce !important; color: #006100; }
+
+    /* สไตล์สำหรับกล่องเวลาลอย (Floating Timer) */
+    #timerDisplay {
+      transition: all 0.3s ease;
+    }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 p-3 md:p-6">
+<body class="bg-slate-100 text-slate-800 p-3 md:p-6 select-none">
+
+  <!-- กล่องแสดงตัวจับเวลา (จะซ่อนไว้ตอนแรก และแสดงเมื่อเริ่มทำ) -->
+  <div id="timerContainer" class="hidden fixed top-4 right-4 z-50 bg-slate-950 text-white font-mono px-4 py-2.5 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-bounce">
+    <span class="text-xl">⏱️</span>
+    <span id="timerDisplay" class="text-lg font-bold">00:00</span>
+  </div>
 
   <div class="max-w-6xl mx-auto bg-white p-6 rounded-2xl shadow-xl border border-slate-200">
     
     <div class="text-center mb-6 border-b pb-4">
       <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800">กิจกรรมที่ 2.2 การจัดเรียงข้อมูล</h1>
-      <p class="text-red-500 mt-2 font-semibold text-sm md:text-base">⚠️ คำชี้แจง: นักเรียนต้องเติมคำตอบให้ครบทั้ง 2 ตอน (ตอนที่ 1 และ ตอนที่ 2) จึงจะสามารถกดส่งงานได้</p>
+      <p class="text-red-500 mt-2 font-semibold text-sm md:text-base">⚠️ คำชี้แจง: นักเรียนต้องเติมคำตอบให้ครบทุกช่อง จึงจะสามารถกดส่งงานได้ (ตอบผิดสามารถกดส่งได้ แต่คะแนนจะคิดตามที่ตอบถูกจริง)</p>
     </div>
 
     <form id="activityForm" onsubmit="handleSubmit(event)">
       
-      <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8 bg-slate-50 p-4 rounded-xl border border-slate-200">
+      <!-- ข้อมูลผู้เรียน -->
+      <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
         <div>
           <label class="block text-xs md:text-sm font-bold text-slate-700">เลขประจำตัว</label>
           <input type="text" id="studentId" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
@@ -61,6 +73,27 @@
         </div>
       </div>
 
+      <!-- กล่องคำชี้แจงเกณฑ์เวลา -->
+      <div class="mb-6 bg-amber-50 border border-amber-300 rounded-xl p-4 text-sm">
+        <h3 class="font-bold text-amber-900 flex items-center gap-2 mb-2 text-base">
+          ⏱️ เกณฑ์การจับเวลาและการหักคะแนนสุทธิ
+        </h3>
+        <p class="text-amber-800 mb-2">ระบบจะเริ่มจับเวลาโดยอัตโนมัติ <strong>เมื่อนักเรียนเริ่มพิมพ์คำตอบช่องแรกในตาราง</strong> และมีเกณฑ์การคำนวณคะแนนจากเวลาที่ใช้ดังนี้:</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+          <ul class="list-disc pl-5 space-y-1 text-amber-950 font-medium">
+            <li>ใช้เวลาน้อยกว่าหรือเท่ากับ <span class="text-emerald-700">15 นาที</span> : <span class="bg-emerald-100 px-1.5 py-0.5 rounded text-emerald-800">ไม่มีการหักคะแนน</span></li>
+            <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-amber-700">17 นาที</span> : <span class="bg-amber-100 px-1.5 py-0.5 rounded text-amber-800">หัก 1 คะแนน</span></li>
+            <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-orange-700">19 นาที</span> : <span class="bg-orange-100 px-1.5 py-0.5 rounded text-orange-800">หัก 2 คะแนน</span></li>
+          </ul>
+          <ul class="list-disc pl-5 space-y-1 text-amber-950 font-medium">
+            <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-red-600">21 นาที</span> : <span class="bg-red-100 px-1.5 py-0.5 rounded text-red-800">หัก 3 คะแนน</span></li>
+            <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-red-700">23 นาที</span> : <span class="bg-red-150 px-1.5 py-0.5 rounded text-red-800">หัก 4 คะแนน</span></li>
+            <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-red-800 font-bold">25 นาที</span> : <span class="bg-red-200 px-1.5 py-0.5 rounded text-red-900">-5 คะแนน (สูงสุด)</span></li>
+          </ul>
+        </div>
+        <p class="text-red-600 mt-3 font-bold">❌ ข้อควรระวัง: ห้ามกดสลับแท็บ ย่อหน้าต่าง หรือเปิดโปรแกรมอื่นขณะทำกิจกรรม มิฉะนั้นระบบจะทำการบันทึกและขึ้นเตือนพฤทีตกรรมทันที!</p>
+      </div>
+
       <div class="mb-6 bg-blue-50 p-4 rounded-xl border border-blue-200">
         <span class="font-bold text-blue-900 text-sm md:text-base">🔢 ข้อมูลชุดตัวเลขเริ่มต้น:</span>
         <div class="flex flex-wrap gap-2 mt-2">
@@ -75,6 +108,7 @@
         </div>
       </div>
 
+      <!-- ตอนที่ 1 -->
       <div class="mb-10">
         <h2 class="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
           <span class="bg-blue-600 text-white rounded-full w-6 h-6 inline-flex items-center justify-center text-sm">1</span>
@@ -98,86 +132,87 @@
             <tbody class="divide-y divide-slate-200 bg-white">
               <tr>
                 <td class="p-2 border font-bold bg-slate-50">รอบที่ 1</td>
-                <td class="p-1 border"><input type="number" data-ans="22" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="67" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="58" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="47" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="35" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="99" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="82" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="43" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="22" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="67" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="58" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="47" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="35" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="99" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="82" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="43" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
               </tr>
               <tr>
                 <td class="p-2 border font-bold bg-slate-50">รอบที่ 2</td>
-                <td class="p-1 border"><input type="number" data-ans="22" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="35" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="58" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="47" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="67" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="99" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="82" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="43" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="22" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="35" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="58" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="47" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="67" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="99" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="82" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="43" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
               </tr>
               <tr>
                 <td class="p-2 border font-bold bg-slate-50">รอบที่ 3</td>
-                <td class="p-1 border"><input type="number" data-ans="22" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="35" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="43" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="47" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="67" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="99" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="82" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="58" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="22" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="35" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="43" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="47" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="67" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="99" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="82" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="58" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
               </tr>
               <tr>
                 <td class="p-2 border font-bold bg-slate-50">รอบที่ 4</td>
-                <td class="p-1 border"><input type="number" data-ans="22" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="35" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="43" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="47" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="67" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="99" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="82" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="58" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="22" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="35" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="43" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="47" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="67" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="99" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="82" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="58" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
               </tr>
               <tr>
                 <td class="p-2 border font-bold bg-slate-50">รอบที่ 5</td>
-                <td class="p-1 border"><input type="number" data-ans="22" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="35" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="43" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="47" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="58" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="99" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="82" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="67" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="22" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="35" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="43" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="47" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="58" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="99" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="82" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="67" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
               </tr>
               <tr>
                 <td class="p-2 border font-bold bg-slate-50">รอบที่ 6</td>
-                <td class="p-1 border"><input type="number" data-ans="22" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="35" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="43" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="47" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="58" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="67" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="82" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="99" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="22" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="35" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="43" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="47" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="58" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="67" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="82" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="99" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
               </tr>
               <tr>
                 <td class="p-2 border font-bold bg-slate-50">รอบที่ 7</td>
-                <td class="p-1 border"><input type="number" data-ans="22" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="35" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="43" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="47" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="58" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="67" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="82" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="99" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="22" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="35" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="43" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="47" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="58" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="67" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="82" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="99" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
+      <!-- ตอนที่ 2 -->
       <div class="mb-8">
         <h2 class="text-lg font-bold text-emerald-800 mb-3 flex items-center gap-2">
           <span class="bg-emerald-600 text-white rounded-full w-6 h-6 inline-flex items-center justify-center text-sm">2</span>
@@ -201,86 +236,87 @@
             <tbody class="divide-y divide-slate-200 bg-white">
               <tr>
                 <td class="p-2 border font-bold bg-slate-50">รอบที่ 1</td>
-                <td class="p-1 border"><input type="number" data-ans="35" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="67" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="58" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="47" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="22" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="99" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="82" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="43" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="35" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="67" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="58" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="47" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="22" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="99" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="82" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="43" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
               </tr>
               <tr>
                 <td class="p-2 border font-bold bg-slate-50">รอบที่ 2</td>
-                <td class="p-1 border"><input type="number" data-ans="35" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="58" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="67" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="47" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="22" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="99" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="82" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="43" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="35" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="58" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="67" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="47" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="22" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="99" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="82" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="43" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
               </tr>
               <tr>
                 <td class="p-2 border font-bold bg-slate-50">รอบที่ 3</td>
-                <td class="p-1 border"><input type="number" data-ans="35" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="47" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="58" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="67" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="22" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="99" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="82" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="43" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="35" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="47" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="58" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="67" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="22" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="99" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="82" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="43" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
               </tr>
               <tr>
-               <td class="p-2 border font-bold bg-slate-50">รอบที่ 4</td>
-                <td class="p-1 border"><input type="number" data-ans="22" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="35" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="47" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="58" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="67" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="99" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td> 
-                <td class="p-1 border"><input type="number" data-ans="82" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="43" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-2 border font-bold bg-slate-50">รอบที่ 4</td>
+                <td class="p-1 border"><input type="number" data-ans="22" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="35" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="47" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="58" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="67" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="99" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td> 
+                <td class="p-1 border"><input type="number" data-ans="82" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="43" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
               </tr>
               <tr>
                 <td class="p-2 border font-bold bg-slate-50">รอบที่ 5</td>
-                <td class="p-1 border"><input type="number" data-ans="22" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="35" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="47" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="58" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="67" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="99" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="82" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
-                  <td class="p-1 border"><input type="number" data-ans="43" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="22" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="35" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="47" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="58" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="67" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="99" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="82" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="43" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
               </tr>
               <tr>
                 <td class="p-2 border font-bold bg-slate-50">รอบที่ 6</td>
-                <td class="p-1 border"><input type="number" data-ans="22" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="35" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="47" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="58" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="67" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="82" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="99" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="43" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="22" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="35" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="47" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="58" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="67" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="82" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="99" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="43" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input w-full p-1 text-center rounded outline-none" required></td>
               </tr>
               <tr>
                 <td class="p-2 border font-bold bg-slate-50">รอบที่ 7</td>
-                <td class="p-1 border"><input type="number" data-ans="22" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="35" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="43" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="47" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="58" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="67" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="82" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
-                <td class="p-1 border"><input type="number" data-ans="99" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="22" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="35" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="43" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="47" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="58" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="67" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="82" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
+                <td class="p-1 border"><input type="number" data-ans="99" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input excel-green w-full p-1 text-center rounded outline-none" required></td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
+      <!-- ปุ่มส่งคำตอบ -->
       <div class="flex justify-center items-center bg-slate-50 border p-4 rounded-xl">
         <button type="submit" id="submitBtn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-12 rounded-lg shadow-md transition-all cursor-pointer text-center">
           ส่งคำตอบบันทึกข้อมูล
@@ -291,6 +327,12 @@
   </div>
 
   <script>
+    let timerStarted = false;
+    let startTime = null;
+    let timerInterval = null;
+    let cheatCount = 0;
+
+    // ส่วนที่แก้ไข: เพิ่มกล่องข้อความป๊อปอัพแจ้งเมื่อกรอกข้อมูลผิดพลาด
     function checkAnswerRealTime(input) {
       const userValue = input.value.trim();
       const correctAnswer = input.getAttribute('data-ans');
@@ -304,90 +346,104 @@
         input.classList.remove('input-error');
       } else {
         input.classList.add('input-error');
-        
-        const table = input.closest('table');
-        const thead = table.querySelector('thead');
-        const isSelection = thead.classList.contains('bg-blue-600');
-        
-        const typeName = isSelection ? "ตอนที่ 1: การเรียงข้อมูลแบบเลือก (Selection Sort)" : "ตอนที่ 2: การจัดเรียงแบบแทรก (Insertion Sort)";
-        const rowName = input.closest('tr').querySelector('td').innerText;
-        
-        alert(`❌ คำตอบไม่ถูกต้องนะคะ!\n\n📌 ตำแหน่ง: ${typeName}\n📌 ${rowName}\n\nลองทบทวนหลักการจัดเรียงแล้วแก้คำตอบอีกครั้งนะคะ ✌️`);
+        // แสดง Alert ป๊อปอัพเตือนนักเรียนทันที
+        alert(`❌ คำตอบยังไม่ถูกต้องค่ะ! กรุณาตรวจสอบและลองคำนวณใหม่อีกครั้งนะ`);
       }
     }
 
-    // ฟังก์ชันคำนวณคะแนนดิบที่เด็กตอบถูกจริง
-    function calculateRawScore() {
-      const inputs = document.querySelectorAll('.quiz-input');
-      let score = 0;
-      inputs.forEach(input => {
-        if (input.value.trim() === input.getAttribute('data-ans')) {
-          score++;
-        }
-      });
-      return score;
+    function startTimerOnFirstInput() {
+      if (!timerStarted) {
+        timerStarted = true;
+        startTime = new Date();
+        document.getElementById('timerContainer').classList.remove('hidden');
+        timerInterval = setInterval(updateTimerDisplay, 1000);
+      }
     }
+
+    function updateTimerDisplay() {
+      if (!startTime) return;
+      const now = new Date();
+      const diffInSeconds = Math.floor((now - startTime) / 1000);
+      
+      const minutes = Math.floor(diffInSeconds / 60).toString().padStart(2, '0');
+      const seconds = (diffInSeconds % 60).toString().padStart(2, '0');
+      
+      const timerDisplay = document.getElementById('timerDisplay');
+      timerDisplay.innerText = `${minutes}:${seconds}`;
+
+      if (diffInSeconds >= 900) { 
+        timerDisplay.style.color = '#f59e0b';
+      }
+      if (diffInSeconds >= 1020) { 
+        timerDisplay.style.color = '#ef4444';
+      }
+    }
+
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden && timerStarted) {
+        cheatCount++;
+        alert(`⚠️ คำเตือนครั้งที่ ${cheatCount}: ห้ามเปลี่ยนแท็บหรือออกจากหน้าจอขณะทำกิจกรรมค่ะ!`);
+      }
+    });
 
     function handleSubmit(event) {
       event.preventDefault();
 
-      const hasErrors = document.querySelectorAll('.input-error').length > 0;
-      if (hasErrors) {
-        alert('⚠️ ไม่สามารถส่งงานได้: กรุณาแก้ไขช่องที่ยังตอบผิด (ขอบสีแดง) ให้ถูกต้องก่อนนะคะ!');
-        return;
+      const inputs = document.querySelectorAll('.quiz-input');
+      let totalQuestions = inputs.length;
+      let correctAnswers = 0;
+
+      inputs.forEach(input => {
+        if (input.value.trim() === input.getAttribute('data-ans')) {
+          correctAnswers++;
+        }
+      });
+
+      let minutesUsed = 0;
+      let penalty = 0;
+
+      if (timerStarted && startTime) {
+        clearInterval(timerInterval);
+        const endTime = new Date();
+        const timeDiffInSeconds = Math.floor((endTime - startTime) / 1000);
+        minutesUsed = timeDiffInSeconds / 60;
+
+        if (minutesUsed >= 25) {
+          penalty = 5;
+        } else if (minutesUsed >= 23) {
+          penalty = 4;
+        } else if (minutesUsed >= 21) {
+          penalty = 3;
+        } else if (minutesUsed >= 19) {
+          penalty = 2;
+        } else if (minutesUsed >= 17) {
+          penalty = 1;
+        } else {
+          penalty = 0;
+        }
       }
 
-      const totalInputs = document.querySelectorAll('.quiz-input').length;
-      const rawScore = calculateRawScore();
+      let finalScore = Math.max(0, correctAnswers - penalty);
+      let timeString = timerStarted ? `${Math.floor(minutesUsed)} นาที ${Math.floor((minutesUsed % 1) * 60)} วินาที` : "ไม่ได้เริ่มทำในตาราง";
       
-      // 🎯 ส่วนที่แก้ไข: แปลงฐานคะแนนจากข้อทั้งหมดให้กลายเป็น 5 คะแนนเต็ม (ทศนิยม 2 ตำแหน่ง)
-      const finalScoreScaled = ((rawScore / totalInputs) * 5).toFixed(2);
-      const maxScoreTarget = 5;
+      let resultMessage = `🎉 บันทึกข้อมูลสำเร็จ!\n\n` +
+                          `📝 ตอบถูกทั้งหมด: ${correctAnswers} จาก ${totalQuestions} ช่อง\n` +
+                          `⏱️ เวลาที่ใช้ไป: ${timeString}\n` +
+                          `📉 ถูกหักคะแนนจากเวลา: -${penalty} คะแนน\n` +
+                          `📊 คะแนนสุทธิที่ได้: ${finalScore} คะแนน\n\n`;
+      
+      if (cheatCount > 0) {
+        resultMessage += `⚠️ หมายเหตุ: พบการเปลี่ยนแท็บ/ออกจากหน้าจอจำนวน ${cheatCount} ครั้ง`;
+      }
 
-      const submitBtn = document.getElementById('submitBtn');
-      submitBtn.disabled = true;
-      submitBtn.innerText = '⏳ กำลังบันทึกข้อมูลลงระบบ...';
-      submitBtn.className = "w-full sm:w-auto bg-slate-400 text-white font-bold py-3 px-12 rounded-lg shadow-md cursor-not-allowed text-center";
+      alert(resultMessage);
 
-      // ⚙️ [สำคัญ] อย่าลืมใส่ลิงก์ Webhook URL (Google Apps Script) ของคุณครูตรงนี้
-      const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwaOmgaVONoD3SET4aL8keeXPByCWmGzWbgXKq36X1kpi-9VSOPac3arZjn5aB4owegIg/exec';
-
-      const formData = new URLSearchParams();
-      formData.append('studentId', document.getElementById('studentId').value.trim());
-      formData.append('title', document.getElementById('title').value);
-      formData.append('fullName', document.getElementById('fullName').value.trim());
-      formData.append('no', document.getElementById('no').value);
-      formData.append('section', document.getElementById('section').value.trim());
-      formData.append('room', document.getElementById('room').value.trim());
-      formData.append('score', finalScoreScaled); // ส่งคะแนนที่ทอนเหลือ 5 คะแนนไปที่ Google Sheet
-      formData.append('maxScore', maxScoreTarget);  // ส่งเลข 5 ไปเป็นคะแนนเต็ม
-
-      fetch(WEBHOOK_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: formData.toString()
-      })
-      .then(response => {
-        if (response.ok) {
-          // 🎉 แจ้งเตือนเมื่อข้อมูลถูกบันทึกสำเร็จ (แสดงแบบ 5 คะแนนเต็มเช่นกัน)
-          alert(`🎉 ระบบได้บันทึกข้อมูลลงระบบสำเร็จแล้วค่ะ!\n\n👤 ผู้ส่ง: ${document.getElementById('title').value}${document.getElementById('fullName').value.trim()}\n💯 ได้คะแนน: ${finalScoreScaled} / ${maxScoreTarget} คะแนน`);
-          
-          document.getElementById('activityForm').reset();
-          document.querySelectorAll('.quiz-input').forEach(input => input.classList.remove('input-error'));
-        } else {
-          throw new Error('Network response was not ok.');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('❌ เกิดข้อผิดพลาดทางเทคนิคในการเชื่อมต่อ Google Sheets กรุณาลองใหม่อีกครั้ง หรือติดต่อครูผู้สอนค่ะ');
-      })
-      .finally(() => {
-        submitBtn.disabled = false;
-        submitBtn.innerText = 'ส่งคำตอบบันทึกข้อมูล';
-        submitBtn.className = "w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-12 rounded-lg shadow-md transition-all cursor-pointer text-center";
+      console.log({
+        studentId: document.getElementById('studentId').value,
+        fullName: document.getElementById('fullName').value,
+        score: finalScore,
+        timeUsed: timeString,
+        cheats: cheatCount
       });
     }
   </script>
