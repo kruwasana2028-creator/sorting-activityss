@@ -5,24 +5,24 @@
   <title>กิจกรรมที่ 2.2 การจัดเรียงข้อมูล</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <style>
+    /* สไตล์แจ้งเตือนเมื่อเติมคำตอบผิดแบบเรียลไทม์ */
     .input-error {
       border: 3px solid #ef4444 !important;
       color: #b91c1c !important;
       background-color: #fef2f2 !important;
       font-weight: bold;
     }
+    
+    /* สีไฮไลท์สีเขียวตามไฟล์ Excel ต้นฉบับ */
     .excel-green { background-color: #c6efce !important; color: #006100; }
-    #timerDisplay { transition: all 0.3s ease; }
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+
+    /* สไตล์สำหรับกล่องเวลาลอย (Floating Timer) */
+    #timerDisplay {
+      transition: all 0.3s ease;
     }
-    .animate-slide-in { animation: slideIn 0.3s ease forwards; }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 p-3 md:p-6 select-none relative">
-
-  <div id="toastContainer" class="fixed top-20 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+<body class="bg-slate-100 text-slate-800 p-3 md:p-6 select-none">
 
   <div id="timerContainer" class="hidden fixed top-4 right-4 z-50 bg-slate-950 text-white font-mono px-4 py-2.5 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-bounce">
     <span class="text-xl">⏱️</span>
@@ -33,6 +33,7 @@
     
     <div class="text-center mb-6 border-b pb-4">
       <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800">กิจกรรมที่ 2.2 การจัดเรียงข้อมูล</h1>
+      <p class="text-red-500 mt-2 font-semibold text-sm md:text-base">⚠️ คำชี้แจง: นักเรียนต้องเติมคำตอบให้ครบทุกช่อง จึงจะสามารถกดส่งงานได้ (ตอบผิดสามารถกดส่งได้ แต่คะแนนจะคิดตามที่ตอบถูกจริง)</p>
     </div>
 
     <form id="activityForm" onsubmit="handleSubmit(event)">
@@ -40,54 +41,60 @@
       <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
         <div>
           <label class="block text-xs md:text-sm font-bold text-slate-700">เลขประจำตัว</label>
-          <input type="text" id="studentId" required class="mt-1 w-full p-2 border rounded-md bg-white outline-none">
+          <input type="text" id="studentId" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
+        
         <div>
           <label class="block text-xs md:text-sm font-bold text-slate-700">คำนำหน้าชื่อ</label>
-          <select id="title" required class="mt-1 w-full p-2 border rounded-md bg-white outline-none">
+          <select id="title" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
             <option value="" disabled selected>เลือก...</option>
             <option value="นาย">นาย</option>
             <option value="นางสาว">นางสาว</option>
           </select>
         </div>
+        
         <div>
           <label class="block text-xs md:text-sm font-bold text-slate-700">ชื่อ-นามสกุล</label>
-          <input type="text" id="fullName" required class="mt-1 w-full p-2 border rounded-md bg-white outline-none">
+          <input type="text" id="fullName" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
         <div>
           <label class="block text-xs md:text-sm font-bold text-slate-700">เลขที่</label>
-          <input type="number" id="no" required class="mt-1 w-full p-2 border rounded-md bg-white outline-none">
+          <input type="number" id="no" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
         <div>
           <label class="block text-xs md:text-sm font-bold text-slate-700">ตอน (ก,ข)</label>
-          <input type="text" id="section" placeholder="ก หรือ ข" required class="mt-1 w-full p-2 border rounded-md bg-white outline-none">
+          <input type="text" id="section" placeholder="ก หรือ ข" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
         <div class="col-span-2 md:col-span-1">
           <label class="block text-xs md:text-sm font-bold text-slate-700">ห้อง</label>
-          <input type="text" id="room" placeholder="1" required class="mt-1 w-full p-2 border rounded-md bg-white outline-none">
+          <input type="text" id="room" placeholder="1" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
       </div>
 
-      <div class="mb-6 bg-red-50 border border-red-200 rounded-xl p-5 text-sm">
-        <h3 class="font-bold text-red-900 flex items-center gap-2 mb-2 text-base">
-          ⏳ คำชี้แจงและเกณฑ์การให้คะแนนเรื่องเวลา:
+      <div class="mb-6 bg-amber-50 border border-amber-300 rounded-xl p-4 text-sm">
+        <h3 class="font-bold text-amber-900 flex items-center gap-2 mb-2 text-base">
+          ⏱️ เกณฑ์การจับเวลาและการหักคะแนนสุทธิ
         </h3>
-        <p class="text-slate-700 mb-3 font-medium">
-          ระบบจะเริ่มจับเวลาทันทีเมื่อนักเรียนเริ่มกรอกคำตอบลงในช่องแรกของกิจกรรม โปรดทำด้วยความซื่อสัตย์ <span class="text-red-600 underline font-bold">หากสลับไปแท็บอื่นหรือออกจากหน้าต่างนี้ระบบจะทำการแจ้งเตือนทันที</span>
-        </p>
-        <ul class="list-disc pl-5 space-y-1 text-slate-700 font-medium">
-          <li>ใช้เวลาไม่เกิน <span class="font-bold text-slate-900">15 นาที</span> : ไม่หักคะแนน</li>
-          <li>ใช้เวลาตั้งแต่ <span class="font-bold text-red-600">17 นาทีขึ้นไป</span> : หัก 1 คะแนน</li>
-          <li>ใช้เวลาตั้งแต่ <span class="font-bold text-red-600">19 นาทีขึ้นไป</span> : หัก 2 คะแนน</li>
-          <li>ใช้เวลาตั้งแต่ <span class="font-bold text-red-600">21 นาทีขึ้นไป</span> : หัก 3 คะแนน</li>
-          <li>ใช้เวลาตั้งแต่ <span class="font-bold text-red-600">23 นาทีขึ้นไป</span> : หัก 4 คะแนน</li>
-          <li>ใช้เวลาตั้งแต่ <span class="font-bold text-red-600">25 นาทีขึ้นไป</span> : หัก 5 คะแนน (คะแนนสุทธิต่ำสุดคือ 0 คะแนน)</li>
-        </ul>
+        <p class="text-amber-800 mb-2">ระบบจะเริ่มจับเวลาโดยอัตโนมัติ <strong>เมื่อนักเรียนเริ่มพิมพ์คำตอบช่องแรกในตาราง</strong> และมีเกณฑ์การคำนวณคะแนนจากเวลาที่ใช้ดังนี้:</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+          <ul class="list-disc pl-5 space-y-1 text-amber-950 font-medium">
+            <li>ใช้เวลาน้อยกว่าหรือเท่ากับ <span class="text-emerald-700">15 นาที</span> : <span class="bg-emerald-100 px-1.5 py-0.5 rounded text-emerald-800">ไม่มีการหักคะแนน</span></li>
+            <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-amber-700">17 นาที</span> : <span class="bg-amber-100 px-1.5 py-0.5 rounded text-amber-800">หัก 1 คะแนน</span></li>
+            <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-orange-700">19 นาที</span> : <span class="bg-orange-100 px-1.5 py-0.5 rounded text-orange-800">หัก 2 คะแนน</span></li>
+          </ul>
+          <ul class="list-disc pl-5 space-y-1 text-amber-950 font-medium">
+            <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-red-600">21 นาที</span> : <span class="bg-red-100 px-1.5 py-0.5 rounded text-red-800">หัก 3 คะแนน</span></li>
+            <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-red-700">23 นาที</span> : <span class="bg-red-150 px-1.5 py-0.5 rounded text-red-800">หัก 4 คะแนน</span></li>
+            <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-red-800 font-bold">25 นาที</span> : <span class="bg-red-200 px-1.5 py-0.5 rounded text-red-900">-5 คะแนน (สูงสุด)</span></li>
+          </ul>
+        </div>
+        <p class="text-red-600 mt-3 font-bold">❌ ข้อควรระวัง: ห้ามกดสลับแท็บ ย่อหน้าต่าง หรือเปิดโปรแกรมอื่นขณะทำกิจกรรม มิฉะนั้นระบบจะทำการบันทึกและขึ้นเตือนพฤติกรรมทันที!</p>
       </div>
 
       <div class="mb-6 bg-blue-50 p-4 rounded-xl border border-blue-200">
-        <span class="font-bold text-blue-900 text-sm md:text-base">🔢 ข้อมูลชุดตัวเลขเริ่มต้น:</span>
-        <div id="numbersDisplay" class="flex flex-wrap gap-2 mt-2"></div>
+        <span class="font-bold text-blue-900 text-sm md:text-base">🔢 ข้อมูลชุดตัวเลขเริ่มต้น: เรียงจากน้อยไปหามาก</span>
+        <div id="quizNumbersContainer" class="flex flex-wrap gap-2 mt-2">
+          </div>
       </div>
 
       <div class="mb-10">
@@ -110,7 +117,8 @@
                 <th class="p-2 border border-blue-700">ดัชนี 7</th>
               </tr>
             </thead>
-            <tbody id="selectionSortBody" class="divide-y divide-slate-200 bg-white"></tbody>
+            <tbody id="selectionTableBody" class="divide-y divide-slate-200 bg-white">
+              </tbody>
           </table>
         </div>
       </div>
@@ -135,193 +143,277 @@
                 <th class="p-2 border border-emerald-700">ดัชนี 7</th>
               </tr>
             </thead>
-            <tbody id="insertionSortBody" class="divide-y divide-slate-200 bg-white"></tbody>
+            <tbody id="insertionTableBody" class="divide-y divide-slate-200 bg-white">
+              </tbody>
           </table>
         </div>
       </div>
 
-      <div class="text-center mt-6">
-        <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transition">ส่งคำตอบ</button>
+      <div class="flex justify-center items-center bg-slate-50 border p-4 rounded-xl">
+        <button type="submit" id="submitBtn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-12 rounded-lg shadow-md transition-all cursor-pointer text-center">
+          ส่งคำตอบบันทึกข้อมูล
+        </button>
       </div>
+
     </form>
   </div>
 
   <script>
+    // 🔴 ส่วนสำคัญ: วางลิงก์ Web App URL ที่ได้จาก Google Apps Script ที่นี่
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyv00vw63HsCpzIiMXQ7uYTMdwxpiPWeW5xSTedv0bCLPut_rg0TJ9EZad-tY2SKJ3WqA/exec";
+
     let timerStarted = false;
-    let timerInterval;
-    let secondsElapsed = 0;
+    let startTime = null;
+    let timerInterval = null;
+    let cheatCount = 0;
 
-    // โครงสร้างเดิมที่คุณครูตั้งไว้สำหรับเช็กการสลับหน้าจอ (Cheat Protection ของเดิม)
-    let isTabActive = true;
-    window.onblur = function() {
-      isTabActive = false;
-      if (timerStarted) {
-        // ดึงแจ้งเตือนพฤติกรรมทันทีตามกลไกเดิมของคุณครู
-        alert("⚠️ แจ้งเตือนพฤติกรรม!\nระบบตรวจพบว่าคุณสลับไปแท็บอื่นหรือออกจากหน้าต่างกิจกรรม โปรดทำด้วยความซื่อสัตย์");
-      }
-    };
-    window.onfocus = function() {
-      isTabActive = true;
-    };
+    // --- ส่วนประมวลผลการสุ่มโจทย์และการคำนวณเฉลยอัตโนมัติ ---
 
+    // 1. สุ่มตัวเลข 2 หลัก (10-99) จำนวน 8 ตัวไม่ซ้ำกัน
     function generateRandomNumbers() {
       const numbers = [];
-      while(numbers.length < 8) {
-        let r = Math.floor(Math.random() * 90) + 10;
-        if(!numbers.includes(r)) numbers.push(r);
+      while (numbers.length < 8) {
+        let rand = Math.floor(Math.random() * 90) + 10;
+        if (!numbers.includes(rand)) {
+          numbers.push(rand);
+        }
       }
       return numbers;
     }
 
-    function getSelectionSortHistory(arr) {
-      let history = [];
-      let tempArr = [...arr];
-      let n = tempArr.length;
-      for (let i = 0; i < n - 1; i++) {
+    // 2. ฟังก์ชันคำนวณเฉลยของแต่ละรอบไว้ล่วงหน้า
+    function generateSortingAnswers(initialNumbers) {
+      // คำนวณคำตอบ Selection Sort (7 รอบ)
+      let selectionPasses = [];
+      let currentSel = [...initialNumbers];
+      for (let i = 0; i < 7; i++) {
         let minIdx = i;
-        for (let j = i + 1; j < n; j++) {
-          if (tempArr[j] < tempArr[minIdx]) minIdx = j;
+        for (let j = i + 1; j < currentSel.length; j++) {
+          if (currentSel[j] < currentSel[minIdx]) {
+            minIdx = j;
+          }
         }
-        let temp = tempArr[i];
-        tempArr[i] = tempArr[minIdx];
-        tempArr[minIdx] = temp;
-        history.push([...tempArr]);
+        let temp = currentSel[i];
+        currentSel[i] = currentSel[minIdx];
+        currentSel[minIdx] = temp;
+        selectionPasses.push([...currentSel]);
       }
-      return history;
-    }
 
-    function getInsertionSortHistory(arr) {
-      let history = [];
-      let tempArr = [...arr];
-      let n = tempArr.length;
-      for (let i = 1; i < n; i++) {
-        let key = tempArr[i];
+      // คำนวณคำตอบ Insertion Sort (7 รอบ ตามตารางเดิม)
+      let insertionPasses = [];
+      let currentIns = [...initialNumbers];
+      for (let i = 1; i < currentIns.length; i++) {
+        let key = currentIns[i];
         let j = i - 1;
-        while (j >= 0 && tempArr[j] > key) {
-          tempArr[j + 1] = tempArr[j];
+        while (j >= 0 && currentIns[j] > key) {
+          currentIns[j + 1] = currentIns[j];
           j = j - 1;
         }
-        tempArr[j + 1] = key;
-        history.push([...tempArr]);
+        currentIns[j + 1] = key;
+        insertionPasses.push([...currentIns]);
       }
-      return history;
+
+      return { selectionPasses, insertionPasses };
     }
 
-    function autoInitQuiz() {
-      clearInterval(timerInterval);
-      timerStarted = false;
-      secondsElapsed = 0;
-      document.getElementById('timerContainer').classList.add('hidden');
-      document.getElementById('timerDisplay').innerText = "00:00";
-
-      const baseNumbers = generateRandomNumbers();
-      const displayDiv = document.getElementById('numbersDisplay');
-      displayDiv.innerHTML = '';
-      baseNumbers.forEach(num => {
-        displayDiv.innerHTML += `<span class="px-3 py-1.5 bg-white border border-blue-300 rounded font-bold text-slate-700">${num}</span>`;
+    // 3. ฟังก์ชัน Render หน้าตารางและนำชุดตัวเลขสุ่มไปใส่ไว้ในหน้าเว็บ
+    function initQuiz() {
+      const quizNumbers = generateRandomNumbers();
+      
+      // แสดงตัวเลขเริ่มต้นบนหน้าเว็บ
+      const container = document.getElementById('quizNumbersContainer');
+      container.innerHTML = '';
+      quizNumbers.forEach(num => {
+        const span = document.createElement('span');
+        span.className = "px-3 py-1.5 bg-white border border-blue-300 rounded font-bold text-slate-700 shadow-sm text-base";
+        span.innerText = num;
+        container.appendChild(span);
       });
 
-      const selectionAns = getSelectionSortHistory(baseNumbers);
-      const insertionAns = getInsertionSortHistory(baseNumbers);
+      // ดึงคำตอบอาเรย์ในแต่ละรอบ
+      const answers = generateSortingAnswers(quizNumbers);
 
-      const selectBody = document.getElementById('selectionSortBody');
-      selectBody.innerHTML = '';
-      for(let r = 0; r < 7; r++) {
-        let rowHtml = `<tr><td class="p-2 border font-bold bg-slate-50 text-xs md:text-sm">รอบที่ ${r+1}</td>`;
-        for(let c = 0; c < 8; c++) {
-          let greenClass = (c <= r) ? 'excel-green' : '';
-          rowHtml += `<td class="p-1 border">
-            <input type="number" data-ans="${selectionAns[r][c]}" data-name="Selection Sort รอบที่ ${r+1} ดัชนี ${c}" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input ${greenClass} w-full p-1 text-center rounded outline-none" required>
-          </td>`;
-        }
-        rowHtml += `</tr>`;
-        selectBody.innerHTML += rowHtml;
-      }
+      // สร้างตาราง Selection Sort (7 รอบ)
+      const selectionBody = document.getElementById('selectionTableBody');
+      selectionBody.innerHTML = '';
+      answers.selectionPasses.forEach((pass, roundIdx) => {
+        const tr = document.createElement('tr');
+        let rowHtml = `<td class="p-2 border font-bold bg-slate-50">รอบที่ ${roundIdx + 1}</td>`;
+        
+        pass.forEach((num, imgIdx) => {
+          // ดัชนีที่ได้รับการเรียงลำดับเสร็จแล้วในรอบนั้นๆ จะถูกไฮไลท์สีเขียว (เช่น รอบที่ 1 จัดเรียงดัชนี 0 เสร็จ)
+          const isGreen = imgIdx <= roundIdx ? 'excel-green' : '';
+          rowHtml += `
+            <td class="p-1 border">
+              <input type="number" data-ans="${num}" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input ${isGreen} w-full p-1 text-center rounded outline-none font-medium" required>
+            </td>`;
+        });
+        tr.innerHTML = rowHtml;
+        selectionBody.appendChild(tr);
+      });
 
-      const insertBody = document.getElementById('insertionSortBody');
-      insertBody.innerHTML = '';
-      for(let r = 0; r < 7; r++) {
-        let rowHtml = `<tr><td class="p-2 border font-bold bg-slate-50 text-xs md:text-sm">รอบที่ ${r+1}</td>`;
-        for(let c = 0; c < 8; c++) {
-          let greenClass = (c <= r + 1) ? 'excel-green' : '';
-          rowHtml += `<td class="p-1 border">
-            <input type="number" data-ans="${insertionAns[r][c]}" data-name="Insertion Sort รอบที่ ${r+1} ดัชนี ${c}" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input ${greenClass} w-full p-1 text-center rounded outline-none" required>
-          </td>`;
-        }
-        rowHtml += `</tr>`;
-        insertBody.innerHTML += rowHtml;
-      }
+      // สร้างตาราง Insertion Sort (7 รอบ)
+      const insertionBody = document.getElementById('insertionTableBody');
+      insertionBody.innerHTML = '';
+      answers.insertionPasses.forEach((pass, roundIdx) => {
+        const tr = document.createElement('tr');
+        let rowHtml = `<td class="p-2 border font-bold bg-slate-50">รอบที่ ${roundIdx + 1}</td>`;
+        
+        pass.forEach((num, imgIdx) => {
+          // ส่วนทางซ้ายที่ได้รับการตรวจสอบและสับแทรกแล้วจะแสดงเป็นสีเขียว (รอบที่ 1 ตรวจสอบเสร็จถึงดัชนี 1)
+          const isGreen = imgIdx <= (roundIdx + 1) ? 'excel-green' : '';
+          rowHtml += `
+            <td class="p-1 border">
+              <input type="number" data-ans="${num}" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input ${isGreen} w-full p-1 text-center rounded outline-none font-medium" required>
+            </td>`;
+        });
+        tr.innerHTML = rowHtml;
+        insertionBody.appendChild(tr);
+      });
     }
 
-    function showToast(title, message) {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      
-      toast.className = `pointer-events-auto bg-red-600 border-red-500 text-white font-semibold px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 border animate-slide-in min-w-[280px] text-sm md:text-base`;
-      toast.innerHTML = `
-        <span class="text-xl">❌</span>
-        <div>
-          <p class="font-bold">${title}</p>
-          <p class="text-xs text-slate-100 font-normal">${message}</p>
-        </div>
-      `;
-      container.appendChild(toast);
-      setTimeout(() => {
-        toast.style.transition = "all 0.4s ease";
-        toast.style.opacity = "0";
-        toast.style.transform = "translateY(-20px)";
-        setTimeout(() => toast.remove(), 400);
-      }, 4000);
-    }
+    // เรียกทำงานการสร้างโจทย์เมื่อโหลดเพจ
+    window.addEventListener('DOMContentLoaded', initQuiz);
+
+
+    // --- ฟังก์ชันการทำงานของระบบกิจกรรมดั้งเดิม ---
 
     function checkAnswerRealTime(input) {
-      const correctAns = input.getAttribute('data-ans');
-      const inputLocation = input.getAttribute('data-name');
-      
-      if (input.value === "") {
+      const userValue = input.value.trim();
+      const correctAnswer = input.getAttribute('data-ans');
+
+      if (userValue === '') {
         input.classList.remove('input-error');
-      } else if (input.value !== correctAns) {
-        input.classList.add('input-error');
-        showToast('คำตอบไม่ถูกต้อง!', `ผิดที่ช่อง: ${inputLocation}`);
+        return;
+      }
+
+      if (userValue === correctAnswer) {
+        input.classList.remove('input-error');
       } else {
-        input.classList.remove('input-error');
+        input.classList.add('input-error');
+        alert(`❌ คำตอบยังไม่ถูกต้องค่ะ! กรุณาตรวจสอบและลองคำนวณใหม้อีกครั้งนะ`);
       }
     }
 
     function startTimerOnFirstInput() {
       if (!timerStarted) {
         timerStarted = true;
+        startTime = new Date();
         document.getElementById('timerContainer').classList.remove('hidden');
-        timerInterval = setInterval(() => {
-          secondsElapsed++;
-          let mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
-          let secs = String(secondsElapsed % 60).padStart(2, '0');
-          document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
-        }, 1000);
+        timerInterval = setInterval(updateTimerDisplay, 1000);
       }
     }
+
+    function updateTimerDisplay() {
+      if (!startTime) return;
+      const now = new Date();
+      const diffInSeconds = Math.floor((now - startTime) / 1000);
+      
+      const minutes = Math.floor(diffInSeconds / 60).toString().padStart(2, '0');
+      const seconds = (diffInSeconds % 60).toString().padStart(2, '0');
+      
+      const timerDisplay = document.getElementById('timerDisplay');
+      timerDisplay.innerText = `${minutes}:${seconds}`;
+
+      if (diffInSeconds >= 900) { 
+        timerDisplay.style.color = '#f59e0b';
+      }
+      if (diffInSeconds >= 1020) { 
+        timerDisplay.style.color = '#ef4444';
+      }
+    }
+
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden && timerStarted) {
+        cheatCount++;
+        alert(`⚠️ คำเตือนครั้งที่ ${cheatCount}: ห้ามเปลี่ยนแท็บหรือออกจากหน้าจอขณะทำกิจกรรมค่ะ!`);
+      }
+    });
 
     function handleSubmit(event) {
       event.preventDefault();
-      const errorInputs = document.querySelectorAll('.input-error');
-      if(errorInputs.length > 0) {
-        alert(`❌ ไม่สามารถส่งงานได้: ยังมีคำตอบที่ผิดอยู่ในตารางจำนวน ${errorInputs.length} ช่อง กรุณาแก้ไขก่อนครับ`);
-        return;
-      }
-      clearInterval(timerInterval);
-      
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = "⏳ กำลังบันทึกข้อมูลลงฐานข้อมูล...";
+
+      const inputs = document.querySelectorAll('.quiz-input');
+      let totalQuestions = inputs.length;
+      let correctAnswers = 0;
+
+      inputs.forEach(input => {
+        if (input.value.trim() === input.getAttribute('data-ans')) {
+          correctAnswers++;
+        }
+      });
+
+      let minutesUsed = 0;
       let penalty = 0;
-      let minutesUsed = secondsElapsed / 60;
-      if (minutesUsed >= 17 && minutesUsed < 19) penalty = 1;
-      else if (minutesUsed >= 19 && minutesUsed < 21) penalty = 2;
-      else if (minutesUsed >= 21 && minutesUsed < 23) penalty = 3;
-      else if (minutesUsed >= 23 && minutesUsed < 25) penalty = 4;
-      else if (minutesUsed >= 25) penalty = 5;
 
-      alert(`🎉 บันทึกข้อมูลกิจกรรมเรียบร้อยแล้ว!\n⏱️ เวลาที่ใช้: ${Math.floor(minutesUsed)} นาที ${secondsElapsed % 60} วินาที\n📉 คะแนนที่ถูกหักจากเกณฑ์เวลา: ${penalty} คะแนน`);
+      if (timerStarted && startTime) {
+        clearInterval(timerInterval);
+        const endTime = new Date();
+        const timeDiffInSeconds = Math.floor((endTime - startTime) / 1000);
+        minutesUsed = timeDiffInSeconds / 60;
+
+        if (minutesUsed >= 25) {
+          penalty = 5;
+        } else if (minutesUsed >= 23) {
+          penalty = 4;
+        } else if (minutesUsed >= 21) {
+          penalty = 3;
+        } else if (minutesUsed >= 19) {
+          penalty = 2;
+        } else if (minutesUsed >= 17) {
+          penalty = 1;
+        } else {
+          penalty = 0;
+        }
+      }
+
+      let finalScore = Math.max(0, correctAnswers - penalty);
+      let timeString = timerStarted ? `${Math.floor(minutesUsed)} นาที ${Math.floor((minutesUsed % 1) * 60)} วินาที` : "ไม่ได้เริ่มทำในตาราง";
+      
+      const formData = {
+        studentId: document.getElementById('studentId').value,
+        title: document.getElementById('title').value,
+        fullName: document.getElementById('fullName').value,
+        no: document.getElementById('no').value,
+        section: document.getElementById('section').value,
+        room: document.getElementById('room').value,
+        correctAnswers: correctAnswers,
+        penalty: penalty,
+        finalScore: finalScore,
+        timeUsed: timeString,
+        cheats: cheatCount
+      };
+
+      fetch(WEB_APP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      })
+      .then(() => {
+        let resultMessage = `🎉 บันทึกข้อมูลลง Google Sheet สำเร็จ!\n\n` +
+                            `📝 ตอบถูกทั้งหมด: ${correctAnswers} จาก ${totalQuestions} ช่อง\n` +
+                            `⏱️ เวลาที่ใช้ไป: ${timeString}\n` +
+                            `📉 ถูกหักคะแนนจากเวลา: -${penalty} คะแนน\n` +
+                            `📊 คะแนนสุทธิที่ได้: ${finalScore} คะแนน\n\n`;
+        
+        if (cheatCount > 0) {
+          resultMessage += `⚠️ หมายเหตุ: พบการเปลี่ยนแท็บ/ออกจากหน้าจอจำนวน ${cheatCount} ครั้ง`;
+        }
+
+        alert(resultMessage);
+        submitBtn.innerText = "✅ ส่งข้อมูลเรียบร้อยแล้ว";
+      })
+      .catch(error => {
+        alert("❌ เกิดข้อผิดพลาดในการส่งข้อมูลเข้าสู่คลาวด์ กรุณาแจ้งครูผู้สอนหรือบันทึกภาพหน้าจอผลลัพธ์นี้ไว้ครับ");
+        console.error(error);
+        submitBtn.disabled = false;
+        submitBtn.innerText = "ส่งคำตอบบันทึกข้อมูล";
+      });
     }
-
-    window.onload = autoInitQuiz;
   </script>
 </body>
 </html>
