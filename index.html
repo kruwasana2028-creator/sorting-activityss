@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>กิจกรรมที่ 2.2 การจัดเรียงข้อมูล (ระบบเปลี่ยนเฉลยรายบุคคล)</title>
+  <title>กิจกรรมที่ 2.2 การจัดเรียงข้อมูล </title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
@@ -26,10 +26,6 @@
     
     /* ซ่อนเนื้อหาโจทย์ไว้ก่อนจนกว่าจะกรอกข้อมูลนักเรียนครบ */
     #quizContentArea { display: none; }
-
-    .swal-report-box { text-align: left; font-size: 16px; margin-top: 15px; background: #fafafa; padding: 15px; border-radius: 8px; border: 1px solid #eee; }
-    .swal-report-line { display: flex; justify-content: space-between; margin-bottom: 8px; }
-    .swal-report-total { font-size: 18px; font-weight: bold; color: #27ae60; border-top: 2px dashed #ddd; padding-top: 8px; margin-top: 8px; }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 p-3 md:p-6 select-none relative" oncontextmenu="return false;">
@@ -40,7 +36,7 @@
     <p class="font-bold mt-4 animate-pulse cursor-pointer bg-red-100 px-4 py-2 rounded-lg">โปรดคลิกที่บริเวณนี้เพื่อปลดล็อกเข้าสู่ใบงานและทำเวลาต่อ</p>
   </div>
 
-  <div id="timerContainer" class="hidden fixed top-4 right-4 z-50 bg-slate-950 text-white font-mono px-4 py-2.5 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-2">
+  <div id="timerContainer" class="hidden fixed top-4 right-4 z-50 bg-slate-950 text-white font-mono px-4 py-2.5 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-bounce">
     <span class="text-xl">⏱️</span>
     <span id="timerDisplay" class="text-lg font-bold">00:00</span>
   </div>
@@ -106,7 +102,8 @@
               <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-red-800 font-bold">25 นาที</span> : <span class="bg-red-200 px-1.5 py-0.5 rounded text-red-900">-5 คะแนน (สูงสุด)</span></li>
             </ul>
           </div>
-          
+          <p class="text-red-600 mt-3 font-bold">⚠️ โจทย์ชุดตัวเลขเริ่มต้นถูกเปลี่ยนใหม่เฉพาะบุคคลตามเลขที่ของนักเรียนเรียบร้อยแล้ว การสลับหน้าจอจะทำให้เวลาหยุดนับชั่วคราวและถูกบันทึกจำนวนครั้งไว้!</p>
+        </div>
 
         <div class="mb-6 bg-blue-50 p-4 rounded-xl border border-blue-200">
           <span class="font-bold text-blue-900 text-sm md:text-base">🔢 ข้อมูลชุดตัวเลขเริ่มต้น:เรียงข้อมูลจากน้อยไปหามาก</span>
@@ -176,7 +173,7 @@
   <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxW8hVnx8Eget8Lke8-v6ya4IrCdxnYLGUZGdf2_EP1670VSmRlQY1ImHA-_bryNdDzUA/exec";
 
-    // คลังฐานตัวเลขตั้งต้น (Base Pool) มี 5 ชุดเพื่อสุ่มกระจายความหลากหลายก่อนนำไปประมวลผลต่อร่วมกับเลขที่
+    // คลังฐานตัวเลขตั้งต้น
     const baseNumberPool = [
       [75, 23, 89, 41, 12, 66, 50, 34],
       [82, 15, 63, 47, 91, 28, 54, 39],
@@ -189,7 +186,7 @@
     let totalSeconds = 0;
     let timerInterval = null;
     let cheatCount = 0;
-    let liveTimerActive = true;
+    let liveTimerActive = true; // ควบคุมสถานะการนับเวลา (Live State)
     let quizNumbers = [];
     let selectedBaseArr = baseNumberPool[Math.floor(Math.random() * baseNumberPool.length)];
 
@@ -199,9 +196,7 @@
       generatePersonalizedQuiz();
     }
 
-    /* ==============================================================
-       ฟังก์ชันหัวใจหลัก: คำนวณโจทย์และสร้างชุดตารางเฉลยรายบุคคลตามเลขที่จริง
-       ============================================================== */
+    // คำนวณโจทย์และสร้างชุดตารางเฉลยรายบุคคลตามเลขที่จริง
     function generatePersonalizedQuiz() {
       const id = document.getElementById('studentId').value.trim();
       const title = document.getElementById('title').value;
@@ -219,21 +214,19 @@
       contentArea.style.display = "block";
       document.getElementById("quizVersionTitle").innerText = `✨ ระบบคำนวณโจทย์อัตโนมัติประจำตัวเลขที่: ${studentNo}`;
 
-      // กลไกคณิตศาสตร์ผสมเลขที่: นำเลขที่คูณ 2 แล้วเอาไปเพิ่ม/ลดค่าในชุดอาร์เรย์ฐาน เพื่อสร้างโจทย์ใหม่ที่ไม่มีซ้ำกัน
+      // กลไกปรับเลขโจทย์ตามเลขที่
       quizNumbers = selectedBaseArr.map((num, index) => {
         let modifier = (studentNo * 2) + index;
-        let finalNum = (num + modifier) % 90 + 10; // ล็อกหลักตัวเลขให้อยู่ช่วง 10 - 99 เพื่อความสวยงามในการกรอก
-        return finalNum;
+        return (num + modifier) % 90 + 10;
       });
 
-      // ป้องกันการเกิดเลขซ้ำในชุดโจทย์ (ถ้าซ้ำให้ +3 ไปเรื่อยๆ)
       for (let i = 0; i < quizNumbers.length; i++) {
         while (quizNumbers.indexOf(quizNumbers[i]) !== i) {
           quizNumbers[i] = (quizNumbers[i] + 3) % 90 + 10;
         }
       }
 
-      // แสดงกล่องเลขโจทย์เริ่มต้น
+      // แสดงโจทย์ตัวเลขเริ่มต้น
       const container = document.getElementById('quizNumbersContainer');
       container.innerHTML = '';
       quizNumbers.forEach(num => {
@@ -243,10 +236,9 @@
         container.appendChild(span);
       });
 
-      // ประมวลผลสร้างตารางเฉลยเฉพาะบุคคลรายข้อ (Behind the scenes sorting)
       const answers = generateSortingAnswers(quizNumbers);
 
-      // เรนเดอร์สร้างตารางโจทย์และฝังเฉลยลับของ Selection Sort
+      // เรนเดอร์ Selection Sort
       const selectionBody = document.getElementById('selectionTableBody');
       selectionBody.innerHTML = '';
       answers.selectionPasses.forEach((pass, roundIdx) => {
@@ -263,7 +255,7 @@
         selectionBody.appendChild(tr);
       });
 
-      // เรนเดอร์สร้างตารางโจทย์และฝังเฉลยลับของ Insertion Sort
+      // เรนเดอร์ Insertion Sort
       const insertionBody = document.getElementById('insertionTableBody');
       insertionBody.innerHTML = '';
       answers.insertionPasses.forEach((pass, roundIdx) => {
@@ -281,7 +273,6 @@
       });
     }
 
-    // ฟังก์ชันคำนวณสเต็ปการคัดแยก (Algorithm Simulation)
     function generateSortingAnswers(initialNumbers) {
       let selectionPasses = [];
       let currentSel = [...initialNumbers];
@@ -311,7 +302,6 @@
       return { selectionPasses, insertionPasses };
     }
 
-    // ตรวจสอบข้อมูลคำตอบแบบเรียลไทม์ตามเฉลยประจำตัว
     function checkAnswerRealTime(input) {
       const userValue = input.value.trim();
       const correctAnswer = input.getAttribute('data-ans');
@@ -328,12 +318,11 @@
         Swal.fire({
           icon: 'error',
           title: 'คำตอบยังไม่ถูกต้องค่ะ!',
-          text: 'ค่าประมวลผลรอบบุคคลของเลขที่นี้ไม่ตรงกับคำตอบของคุณ ลองตรวจสอบใหม่อีกครั้งนะ'
+          text: 'คำตอบไม่ถูกต้อง ลองตรวจสอบใหม่อีกครั้งนะ'
         });
       }
     }
 
-    // เปิดการจับเวลาเมื่อกรอกตัวเลขช่องแรก
     function startTimerOnFirstInput() {
       if (!timerStarted) {
         timerStarted = true;
@@ -343,7 +332,7 @@
     }
 
     function updateTimerDisplay() {
-      if (!liveTimerActive) return;
+      if (!liveTimerActive) return; // ดึงระบบเดิมกลับมา: หยุดนับวินาทีชั่วคราวหาก liveTimerActive เป็น false
       totalSeconds++;
       
       const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
@@ -356,7 +345,6 @@
       if (totalSeconds >= 1020) { timerDisplay.style.color = '#ef4444'; }
     }
 
-    // ระบบความปลอดภัยลายนํ้าเบื้องต้น
     function updateWatermark() {
       const id = document.getElementById('studentId').value.trim();
       const title = document.getElementById('title').value;
@@ -384,21 +372,23 @@
       }
     }
 
-    // ระบบตรวจจับความปลอดภัยเมื่อหลุดโฟกัส (สลับแท็บ/ย่อจอ)
+    /* ==============================================================
+       ดึงระบบตรวจจับพฤติกรรม (Live State Tracking) เดิมกลับมาใช้งานเต็มรูปแบบ
+       ============================================================== */
     document.addEventListener('visibilitychange', function() {
       if (document.hidden && timerStarted) {
-        liveTimerActive = false;
-        cheatCount++;
+        liveTimerActive = false; // กู้คืนสเตตัสเดิม: หยุดเวลาชั่วคราวขณะหลุดโฟกัส
+        cheatCount++;            // กู้คืนสเตตัสเดิม: เพิ่มจำนวนครั้งที่สลับหน้าจอ
         document.getElementById("blurScreen").style.display = "flex";
       }
     });
 
     document.getElementById("blurScreen").addEventListener("click", function() {
       this.style.display = "none";
-      liveTimerActive = true;
+      liveTimerActive = true; // เมื่อคลิกปลดล็อกแล้ว ให้เวลากลับมาเดินต่อแบบเรียลไทม์
     });
 
-    // ประมวลผลและหักคะแนนตามเวลา
+    // ประมวลผลและส่งข้อมูลด้วยโครงสร้างแบบเดิมในไฟล์ index (5).html
     function handleSubmit(event) {
       event.preventDefault();
       const submitBtn = document.getElementById('submitBtn');
@@ -429,6 +419,7 @@
       let finalScore = Math.max(0, correctAnswers - penalty);
       let timeString = timerStarted ? `${minutesUsed} นาที ${totalSeconds % 60} วินาที` : "ไม่ได้เริ่มทำในตาราง";
       
+      // ฟอร์มข้อมูลตามคีย์ชุดตัวแปรเดิมของโค้ดไฟล์ที่ 2.2 ทุกประการ
       const formData = {
         studentId: document.getElementById('studentId').value,
         title: document.getElementById('title').value,
@@ -443,16 +434,7 @@
         cheats: cheatCount
       };
 
-      const reportHtml = `
-        <div class="swal-report-box">
-          <div class="swal-report-line"><span>📝 ตอบถูกทั้งหมด:</span> <b>${correctAnswers} / ${totalQuestions} ช่อง</b></div>
-          <div class="swal-report-line"><span>⏳ เวลาที่ใช้ไปทั้งหมด:</span> <b>${timeString}</b></div>
-          <div class="swal-report-line" style="color: #c0392b;"><span>❌ คะแนนที่ถูกหักจากเวลา:</span> <b>-${penalty} คะแนน</b></div>
-          <div class="swal-report-line swal-report-total"><span>🎯 คะแนนสุทธิที่ได้:</span> <span>${finalScore} คะแนน</span></div>
-          ${cheatCount > 0 ? `<div class="swal-report-line mt-2 text-xs text-red-500 font-bold">⚠️ มีพฤติกรรมสลับหน้าจอ: ${cheatCount} ครั้ง</div>` : ''}
-        </div>
-      `;
-
+      // ยิงข้อมูลกลับเข้า Google Sheets ด้วยวิธีเดิม (no-cors / application/json)
       fetch(WEB_APP_URL, {
         method: "POST",
         mode: "no-cors",
@@ -460,22 +442,24 @@
         body: JSON.stringify(formData)
       })
       .then(() => {
-        Swal.fire({
-          icon: 'success',
-          title: 'ส่งคำตอบและบันทึกข้อมูลเรียบร้อย!',
-          html: reportHtml,
-          confirmButtonText: 'ตกลง',
-          allowOutsideClick: false
-        }).then((result) => {
-          if (result.isConfirmed) { location.reload(); }
-        });
+        // กู้คืนรูปแบบกล่อง Alert แจ้งผลการส่งแบบดั้งเดิมของระบบกลับมา
+        let resultMessage = `🎉 บันทึกข้อมูลลง Google Sheet สำเร็จ!\n\n` +
+                            `📝 ตอบถูกทั้งหมด: ${correctAnswers} จาก ${totalQuestions} ช่อง\n` +
+                            `⏱️ เวลาที่ใช้ไป: ${timeString}\n` +
+                            `📉 ถูกหักคะแนนจากเวลา: -${penalty} คะแนน\n` +
+                            `📊 คะแนนสุทธิที่ได้: ${finalScore} คะแนน\n\n`;
+        
+        if (cheatCount > 0) {
+          resultMessage += `⚠️ หมายเหตุ: พบการเปลี่ยนแท็บ/ออกจากหน้าจอจำนวน ${cheatCount} ครั้ง`;
+        }
+
+        alert(resultMessage);
+        submitBtn.innerText = "✅ ส่งข้อมูลเรียบร้อยแล้ว";
+        location.reload();
       })
       .catch(error => {
-        Swal.fire({
-          icon: 'error',
-          title: 'เกิดข้อผิดพลาดในการส่งข้อมูล',
-          text: 'กรุณาติดต่อคุณครูผู้สอนเพื่อรักษาสิทธิ์คะแนนประจำใบงานครับ'
-        });
+        alert("❌ เกิดข้อผิดพลาดในการส่งข้อมูลเข้าสู่คลาวด์ กรุณาแจ้งครูผู้สอนหรือบันทึกภาพหน้าจอผลลัพธ์นี้ไว้ครับ");
+        console.error(error);
         submitBtn.disabled = false;
         submitBtn.innerText = "ส่งคำตอบบันทึกข้อมูล";
       });
