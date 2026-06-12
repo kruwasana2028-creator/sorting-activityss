@@ -2,8 +2,9 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>กิจกรรมที่ 2.2 การจัดเรียงข้อมูล</title>
+  <title>กิจกรรมที่ 2.2 การจัดเรียงข้อมูล (ระบบเปลี่ยนเฉลยรายบุคคล)</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     /* สไตล์แจ้งเตือนเมื่อเติมคำตอบผิดแบบเรียลไทม์ */
     .input-error {
@@ -16,182 +17,278 @@
     /* สีไฮไลท์สีเขียวตามไฟล์ Excel ต้นฉบับ */
     .excel-green { background-color: #c6efce !important; color: #006100; }
 
-    /* สไตล์สำหรับกล่องเวลาลอย (Floating Timer) */
-    #timerDisplay {
-      transition: all 0.3s ease;
-    }
+    /* สไตล์ลายน้ำป้องกันการแคปหน้าจอ */
+    .watermark-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; overflow: hidden; opacity: 0.06; display: none; }
+    .watermark-text { position: absolute; font-size: 26px; font-weight: bold; color: #000; white-space: nowrap; transform: rotate(-25deg); }
+
+    /* สไตล์ระบบบล็อกและเบลอหน้าจอเมื่อหลุดโฟกัส */
+    .blur-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); z-index: 10000; justify-content: center; align-items: center; flex-direction: column; text-align: center; }
+    
+    /* ซ่อนเนื้อหาโจทย์ไว้ก่อนจนกว่าจะกรอกข้อมูลนักเรียนครบ */
+    #quizContentArea { display: none; }
+
+    .swal-report-box { text-align: left; font-size: 16px; margin-top: 15px; background: #fafafa; padding: 15px; border-radius: 8px; border: 1px solid #eee; }
+    .swal-report-line { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .swal-report-total { font-size: 18px; font-weight: bold; color: #27ae60; border-top: 2px dashed #ddd; padding-top: 8px; margin-top: 8px; }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 p-3 md:p-6 select-none">
+<body class="bg-slate-100 text-slate-800 p-3 md:p-6 select-none relative" oncontextmenu="return false;">
 
-  <div id="timerContainer" class="hidden fixed top-4 right-4 z-50 bg-slate-950 text-white font-mono px-4 py-2.5 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-2 animate-bounce">
+  <div class="blur-overlay text-red-600" id="blurScreen">
+    <h1 class="text-3xl font-extrabold mb-2">🔒 หน้าจอถูกล็อกชั่วคราว</h1>
+    <p class="text-slate-600 text-lg">ระบบตรวจพบว่าหน้าต่างหลุดโฟกัส หรือมีความพยายามสลับหน้าจอออกจากใบงาน</p>
+    <p class="font-bold mt-4 animate-pulse cursor-pointer bg-red-100 px-4 py-2 rounded-lg">โปรดคลิกที่บริเวณนี้เพื่อปลดล็อกเข้าสู่ใบงานและทำเวลาต่อ</p>
+  </div>
+
+  <div id="timerContainer" class="hidden fixed top-4 right-4 z-50 bg-slate-950 text-white font-mono px-4 py-2.5 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-2">
     <span class="text-xl">⏱️</span>
     <span id="timerDisplay" class="text-lg font-bold">00:00</span>
   </div>
 
-  <div class="max-w-6xl mx-auto bg-white p-6 rounded-2xl shadow-xl border border-slate-200">
+  <div class="max-w-6xl mx-auto bg-white p-6 rounded-2xl shadow-xl border border-slate-200 relative" id="mainContainer">
+    <div class="watermark-overlay" id="watermarkLayer"></div>
     
     <div class="text-center mb-6 border-b pb-4">
       <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800">กิจกรรมที่ 2.2 การจัดเรียงข้อมูล</h1>
-      <p class="text-red-500 mt-2 font-semibold text-sm md:text-base">⚠️ คำชี้แจง: นักเรียนต้องเติมคำตอบให้ครบทุกช่อง จึงจะสามารถกดส่งงานได้ (ตอบผิดสามารถกดส่งได้ แต่คะแนนจะคิดตามที่ตอบถูกจริง)</p>
+      <p id="quizVersionTitle" class="text-sm font-bold text-blue-600 mt-1"></p>
     </div>
 
-    <form id="activityForm" onsubmit="handleSubmit(event)">
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
+      <div>
+        <label class="block text-xs md:text-sm font-bold text-slate-700">เลขประจำตัว <span class="text-red-500">*</span></label>
+        <input type="text" id="studentId" required oninput="handleStudentDataChange()" class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+      </div>
       
-      <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
-        <div>
-          <label class="block text-xs md:text-sm font-bold text-slate-700">เลขประจำตัว</label>
-          <input type="text" id="studentId" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        
-        <div>
-          <label class="block text-xs md:text-sm font-bold text-slate-700">คำนำหน้าชื่อ</label>
-          <select id="title" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-            <option value="" disabled selected>เลือก...</option>
-            <option value="นาย">นาย</option>
-            <option value="นางสาว">นางสาว</option>
-          </select>
-        </div>
-        
-        <div>
-          <label class="block text-xs md:text-sm font-bold text-slate-700">ชื่อ-นามสกุล</label>
-          <input type="text" id="fullName" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <div>
-          <label class="block text-xs md:text-sm font-bold text-slate-700">เลขที่</label>
-          <input type="number" id="no" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <div>
-          <label class="block text-xs md:text-sm font-bold text-slate-700">ตอน (ก,ข)</label>
-          <input type="text" id="section" placeholder="ก หรือ ข" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <div class="col-span-2 md:col-span-1">
-          <label class="block text-xs md:text-sm font-bold text-slate-700">ห้อง</label>
-          <input type="text" id="room" placeholder="1" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
+      <div>
+        <label class="block text-xs md:text-sm font-bold text-slate-700">คำนำหน้าชื่อ <span class="text-red-500">*</span></label>
+        <select id="title" required onchange="handleStudentDataChange()" class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+          <option value="" disabled selected>เลือก...</option>
+          <option value="นาย">นาย</option>
+          <option value="นางสาว">นางสาว</option>
+        </select>
       </div>
-
-      <div class="mb-6 bg-amber-50 border border-amber-300 rounded-xl p-4 text-sm">
-        <h3 class="font-bold text-amber-900 flex items-center gap-2 mb-2 text-base">
-          ⏱️ เกณฑ์การจับเวลาและการหักคะแนนสุทธิ
-        </h3>
-        <p class="text-amber-800 mb-2">ระบบจะเริ่มจับเวลาโดยอัตโนมัติ <strong>เมื่อนักเรียนเริ่มพิมพ์คำตอบช่องแรกในตาราง</strong> และมีเกณฑ์การคำนวณคะแนนจากเวลาที่ใช้ดังนี้:</p>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-          <ul class="list-disc pl-5 space-y-1 text-amber-950 font-medium">
-            <li>ใช้เวลาน้อยกว่าหรือเท่ากับ <span class="text-emerald-700">15 นาที</span> : <span class="bg-emerald-100 px-1.5 py-0.5 rounded text-emerald-800">ไม่มีการหักคะแนน</span></li>
-            <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-amber-700">17 นาที</span> : <span class="bg-amber-100 px-1.5 py-0.5 rounded text-amber-800">หัก 1 คะแนน</span></li>
-            <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-orange-700">19 นาที</span> : <span class="bg-orange-100 px-1.5 py-0.5 rounded text-orange-800">หัก 2 คะแนน</span></li>
-          </ul>
-          <ul class="list-disc pl-5 space-y-1 text-amber-950 font-medium">
-            <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-red-600">21 นาที</span> : <span class="bg-red-100 px-1.5 py-0.5 rounded text-red-800">หัก 3 คะแนน</span></li>
-            <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-red-700">23 นาที</span> : <span class="bg-red-150 px-1.5 py-0.5 rounded text-red-800">หัก 4 คะแนน</span></li>
-            <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-red-800 font-bold">25 นาที</span> : <span class="bg-red-200 px-1.5 py-0.5 rounded text-red-900">-5 คะแนน (สูงสุด)</span></li>
-          </ul>
-        </div>
-        <p class="text-red-600 mt-3 font-bold">❌ ข้อควรระวัง: ห้ามกดสลับแท็บ ย่อหน้าต่าง หรือเปิดโปรแกรมอื่นขณะทำกิจกรรม มิฉะนั้นระบบจะทำการบันทึกและขึ้นเตือนพฤติกรรมทันที!</p>
+      
+      <div>
+        <label class="block text-xs md:text-sm font-bold text-slate-700">ชื่อ-นามสกุล <span class="text-red-500">*</span></label>
+        <input type="text" id="fullName" required oninput="handleStudentDataChange()" class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
       </div>
+      <div>
+        <label class="block text-xs md:text-sm font-bold text-slate-700">เลขที่ <span class="text-red-500">*</span></label>
+        <input type="number" id="no" required oninput="handleStudentDataChange()" class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-xs md:text-sm font-bold text-slate-700">ตอน (ก,ข) <span class="text-red-500">*</span></label>
+        <input type="text" id="section" placeholder="ก หรือ ข" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+      </div>
+      <div class="col-span-2 md:col-span-1">
+        <label class="block text-xs md:text-sm font-bold text-slate-700">ห้อง <span class="text-red-500">*</span></label>
+        <input type="text" id="room" placeholder="1" required class="mt-1 w-full p-2 border rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+      </div>
+    </div>
 
-      <div class="mb-6 bg-blue-50 p-4 rounded-xl border border-blue-200">
-        <span class="font-bold text-blue-900 text-sm md:text-base">🔢 ข้อมูลชุดตัวเลขเริ่มต้น: เรียงจากน้อยไปหามาก</span>
-        <div id="quizNumbersContainer" class="flex flex-wrap gap-2 mt-2">
+    <div id="quizContentArea">
+      <form id="activityForm" onsubmit="handleSubmit(event)">
+
+        <div class="mb-6 bg-amber-50 border border-amber-300 rounded-xl p-4 text-sm">
+          <h3 class="font-bold text-amber-900 flex items-center gap-2 mb-2 text-base">
+            ⏱️ เกณฑ์การจับเวลาและการหักคะแนนสุทธิ
+          </h3>
+          <p class="text-amber-800 mb-2">ระบบจะเริ่มจับเวลาโดยอัตโนมัติ <strong>เมื่อนักเรียนเริ่มพิมพ์คำตอบช่องแรกในตาราง</strong> และมีเกณฑ์การคำนวณคะแนนจากเวลาที่ใช้ดังนี้:</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+            <ul class="list-disc pl-5 space-y-1 text-amber-950 font-medium">
+              <li>ใช้เวลาน้อยกว่าหรือเท่ากับ <span class="text-emerald-700">15 นาที</span> : <span class="bg-emerald-100 px-1.5 py-0.5 rounded text-emerald-800">ไม่มีการหักคะแนน</span></li>
+              <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-amber-700">17 นาที</span> : <span class="bg-amber-100 px-1.5 py-0.5 rounded text-amber-800">หัก 1 คะแนน</span></li>
+              <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-orange-700">19 นาที</span> : <span class="bg-orange-100 px-1.5 py-0.5 rounded text-orange-800">หัก 2 คะแนน</span></li>
+            </ul>
+            <ul class="list-disc pl-5 space-y-1 text-amber-950 font-medium">
+              <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-red-600">21 นาที</span> : <span class="bg-red-100 px-1.5 py-0.5 rounded text-red-800">หัก 3 คะแนน</span></li>
+              <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-red-700">23 นาที</span> : <span class="bg-red-150 px-1.5 py-0.5 rounded text-red-800">หัก 4 คะแนน</span></li>
+              <li>ใช้เวลามากกว่าหรือเท่ากับ <span class="text-red-800 font-bold">25 นาที</span> : <span class="bg-red-200 px-1.5 py-0.5 rounded text-red-900">-5 คะแนน (สูงสุด)</span></li>
+            </ul>
           </div>
-      </div>
+          
 
-      <div class="mb-10">
-        <h2 class="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
-          <span class="bg-blue-600 text-white rounded-full w-6 h-6 inline-flex items-center justify-center text-sm">1</span>
-          ตอนที่ 1: การเรียงข้อมูลแบบเลือก (Selection Sort)
-        </h2>
-        <div class="overflow-x-auto rounded-xl border border-slate-300 shadow-sm">
-          <table class="w-full min-w-[700px] border-collapse text-center text-sm">
-            <thead class="bg-blue-600 text-white font-medium">
-              <tr>
-                <th class="p-2 border border-blue-700 w-20">รอบที่</th>
-                <th class="p-2 border border-blue-700">ดัชนี 0</th>
-                <th class="p-2 border border-blue-700">ดัชนี 1</th>
-                <th class="p-2 border border-blue-700">ดัชนี 2</th>
-                <th class="p-2 border border-blue-700">ดัชนี 3</th>
-                <th class="p-2 border border-blue-700">ดัชนี 4</th>
-                <th class="p-2 border border-blue-700">ดัชนี 5</th>
-                <th class="p-2 border border-blue-700">ดัชนี 6</th>
-                <th class="p-2 border border-blue-700">ดัชนี 7</th>
-              </tr>
-            </thead>
-            <tbody id="selectionTableBody" class="divide-y divide-slate-200 bg-white">
-              </tbody>
-          </table>
+        <div class="mb-6 bg-blue-50 p-4 rounded-xl border border-blue-200">
+          <span class="font-bold text-blue-900 text-sm md:text-base">🔢 ข้อมูลชุดตัวเลขเริ่มต้น:เรียงข้อมูลจากน้อยไปหามาก</span>
+          <div id="quizNumbersContainer" class="flex flex-wrap gap-2 mt-2"></div>
         </div>
-      </div>
 
-      <div class="mb-8">
-        <h2 class="text-lg font-bold text-emerald-800 mb-3 flex items-center gap-2">
-          <span class="bg-emerald-600 text-white rounded-full w-6 h-6 inline-flex items-center justify-center text-sm">2</span>
-          ตอนที่ 2: การจัดเรียงแบบแทรก (Insertion Sort)
-        </h2>
-        <div class="overflow-x-auto rounded-xl border border-slate-300 shadow-sm">
-          <table class="w-full min-w-[700px] border-collapse text-center text-sm">
-            <thead class="bg-emerald-600 text-white font-medium">
-              <tr>
-                <th class="p-2 border border-emerald-700 w-20">รอบที่</th>
-                <th class="p-2 border border-emerald-700">ดัชนี 0</th>
-                <th class="p-2 border border-emerald-700">ดัชนี 1</th>
-                <th class="p-2 border border-emerald-700">ดัชนี 2</th>
-                <th class="p-2 border border-emerald-700">ดัชนี 3</th>
-                <th class="p-2 border border-emerald-700">ดัชนี 4</th>
-                <th class="p-2 border border-emerald-700">ดัชนี 5</th>
-                <th class="p-2 border border-emerald-700">ดัชนี 6</th>
-                <th class="p-2 border border-emerald-700">ดัชนี 7</th>
-              </tr>
-            </thead>
-            <tbody id="insertionTableBody" class="divide-y divide-slate-200 bg-white">
-              </tbody>
-          </table>
+        <div class="mb-10">
+          <h2 class="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
+            <span class="bg-blue-600 text-white rounded-full w-6 h-6 inline-flex items-center justify-center text-sm">1</span>
+            ตอนที่ 1: การเรียงข้อมูลแบบเลือก (Selection Sort)
+          </h2>
+          <div class="overflow-x-auto rounded-xl border border-slate-300 shadow-sm">
+            <table class="w-full min-w-[700px] border-collapse text-center text-sm">
+              <thead class="bg-blue-600 text-white font-medium">
+                <tr>
+                  <th class="p-2 border border-blue-700 w-20">รอบที่</th>
+                  <th class="p-2 border border-blue-700">ดัชนี 0</th>
+                  <th class="p-2 border border-blue-700">ดัชนี 1</th>
+                  <th class="p-2 border border-blue-700">ดัชนี 2</th>
+                  <th class="p-2 border border-blue-700">ดัชนี 3</th>
+                  <th class="p-2 border border-blue-700">ดัชนี 4</th>
+                  <th class="p-2 border border-blue-700">ดัชนี 5</th>
+                  <th class="p-2 border border-blue-700">ดัชนี 6</th>
+                  <th class="p-2 border border-blue-700">ดัชนี 7</th>
+                </tr>
+              </thead>
+              <tbody id="selectionTableBody" class="divide-y divide-slate-200 bg-white"></tbody>
+            </table>
+          </div>
         </div>
-      </div>
 
-      <div class="flex justify-center items-center bg-slate-50 border p-4 rounded-xl">
-        <button type="submit" id="submitBtn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-12 rounded-lg shadow-md transition-all cursor-pointer text-center">
-          ส่งคำตอบบันทึกข้อมูล
-        </button>
-      </div>
+        <div class="mb-8">
+          <h2 class="text-lg font-bold text-emerald-800 mb-3 flex items-center gap-2">
+            <span class="bg-emerald-600 text-white rounded-full w-6 h-6 inline-flex items-center justify-center text-sm">2</span>
+            ตอนที่ 2: การจัดเรียงแบบแทรก (Insertion Sort)
+          </h2>
+          <div class="overflow-x-auto rounded-xl border border-slate-300 shadow-sm">
+            <table class="w-full min-w-[700px] border-collapse text-center text-sm">
+              <thead class="bg-emerald-600 text-white font-medium">
+                <tr>
+                  <th class="p-2 border border-emerald-700 w-20">รอบที่</th>
+                  <th class="p-2 border border-emerald-700">ดัชนี 0</th>
+                  <th class="p-2 border border-emerald-700">ดัชนี 1</th>
+                  <th class="p-2 border border-emerald-700">ดัชนี 2</th>
+                  <th class="p-2 border border-emerald-700">ดัชนี 3</th>
+                  <th class="p-2 border border-emerald-700">ดัชนี 4</th>
+                  <th class="p-2 border border-emerald-700">ดัชนี 5</th>
+                  <th class="p-2 border border-emerald-700">ดัชนี 6</th>
+                  <th class="p-2 border border-emerald-700">ดัชนี 7</th>
+                </tr>
+              </thead>
+              <tbody id="insertionTableBody" class="divide-y divide-slate-200 bg-white"></tbody>
+            </table>
+          </div>
+        </div>
 
-    </form>
+        <div class="flex justify-center items-center bg-slate-50 border p-4 rounded-xl">
+          <button type="submit" id="submitBtn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-12 rounded-lg shadow-md transition-all cursor-pointer text-center">
+            ส่งคำตอบบันทึกข้อมูล
+          </button>
+        </div>
+
+      </form>
+    </div>
   </div>
 
   <script>
-    // 🔴 ส่วนสำคัญ: วางลิงก์ Web App URL ที่ได้จาก Google Apps Script ที่นี่
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxW8hVnx8Eget8Lke8-v6ya4IrCdxnYLGUZGdf2_EP1670VSmRlQY1ImHA-_bryNdDzUA/exec";
 
+    // คลังฐานตัวเลขตั้งต้น (Base Pool) มี 5 ชุดเพื่อสุ่มกระจายความหลากหลายก่อนนำไปประมวลผลต่อร่วมกับเลขที่
+    const baseNumberPool = [
+      [75, 23, 89, 41, 12, 66, 50, 34],
+      [82, 15, 63, 47, 91, 28, 54, 39],
+      [44, 71, 19, 85, 32, 68, 57, 24],
+      [93, 38, 62, 17, 76, 45, 81, 29],
+      [55, 13, 79, 42, 88, 26, 61, 37]
+    ];
+
     let timerStarted = false;
-    let startTime = null;
+    let totalSeconds = 0;
     let timerInterval = null;
     let cheatCount = 0;
+    let liveTimerActive = true;
+    let quizNumbers = [];
+    let selectedBaseArr = baseNumberPool[Math.floor(Math.random() * baseNumberPool.length)];
 
-    // --- ส่วนประมวลผลการสุ่มโจทย์และการคำนวณเฉลยอัตโนมัติ ---
-
-    // 1. สุ่มตัวเลข 2 หลัก (10-99) จำนวน 8 ตัวไม่ซ้ำกัน
-    function generateRandomNumbers() {
-      const numbers = [];
-      while (numbers.length < 8) {
-        let rand = Math.floor(Math.random() * 90) + 10;
-        if (!numbers.includes(rand)) {
-          numbers.push(rand);
-        }
-      }
-      return numbers;
+    // ฟังก์ชันติดตามการเปลี่ยนแปลงข้อมูลนักเรียน
+    function handleStudentDataChange() {
+      updateWatermark();
+      generatePersonalizedQuiz();
     }
 
-    // 2. ฟังก์ชันคำนวณเฉลยของแต่ละรอบไว้ล่วงหน้า
+    /* ==============================================================
+       ฟังก์ชันหัวใจหลัก: คำนวณโจทย์และสร้างชุดตารางเฉลยรายบุคคลตามเลขที่จริง
+       ============================================================== */
+    function generatePersonalizedQuiz() {
+      const id = document.getElementById('studentId').value.trim();
+      const title = document.getElementById('title').value;
+      const name = document.getElementById('fullName').value.trim();
+      const noStr = document.getElementById('no').value.trim();
+      const contentArea = document.getElementById('quizContentArea');
+
+      const studentNo = parseInt(noStr, 10);
+
+      if (!id || !title || !name || isNaN(studentNo) || studentNo <= 0) {
+        contentArea.style.display = "none";
+        return;
+      }
+
+      contentArea.style.display = "block";
+      document.getElementById("quizVersionTitle").innerText = `✨ ระบบคำนวณโจทย์อัตโนมัติประจำตัวเลขที่: ${studentNo}`;
+
+      // กลไกคณิตศาสตร์ผสมเลขที่: นำเลขที่คูณ 2 แล้วเอาไปเพิ่ม/ลดค่าในชุดอาร์เรย์ฐาน เพื่อสร้างโจทย์ใหม่ที่ไม่มีซ้ำกัน
+      quizNumbers = selectedBaseArr.map((num, index) => {
+        let modifier = (studentNo * 2) + index;
+        let finalNum = (num + modifier) % 90 + 10; // ล็อกหลักตัวเลขให้อยู่ช่วง 10 - 99 เพื่อความสวยงามในการกรอก
+        return finalNum;
+      });
+
+      // ป้องกันการเกิดเลขซ้ำในชุดโจทย์ (ถ้าซ้ำให้ +3 ไปเรื่อยๆ)
+      for (let i = 0; i < quizNumbers.length; i++) {
+        while (quizNumbers.indexOf(quizNumbers[i]) !== i) {
+          quizNumbers[i] = (quizNumbers[i] + 3) % 90 + 10;
+        }
+      }
+
+      // แสดงกล่องเลขโจทย์เริ่มต้น
+      const container = document.getElementById('quizNumbersContainer');
+      container.innerHTML = '';
+      quizNumbers.forEach(num => {
+        const span = document.createElement('span');
+        span.className = "px-3 py-1.5 bg-white border border-blue-300 rounded font-bold text-slate-700 shadow-sm text-base";
+        span.innerText = num;
+        container.appendChild(span);
+      });
+
+      // ประมวลผลสร้างตารางเฉลยเฉพาะบุคคลรายข้อ (Behind the scenes sorting)
+      const answers = generateSortingAnswers(quizNumbers);
+
+      // เรนเดอร์สร้างตารางโจทย์และฝังเฉลยลับของ Selection Sort
+      const selectionBody = document.getElementById('selectionTableBody');
+      selectionBody.innerHTML = '';
+      answers.selectionPasses.forEach((pass, roundIdx) => {
+        const tr = document.createElement('tr');
+        let rowHtml = `<td class="p-2 border font-bold bg-slate-50">รอบที่ ${roundIdx + 1}</td>`;
+        pass.forEach((num, imgIdx) => {
+          const isGreen = imgIdx <= roundIdx ? 'excel-green' : '';
+          rowHtml += `
+            <td class="p-1 border">
+              <input type="number" data-ans="${num}" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input ${isGreen} w-full p-1 text-center rounded outline-none font-medium" required>
+            </td>`;
+        });
+        tr.innerHTML = rowHtml;
+        selectionBody.appendChild(tr);
+      });
+
+      // เรนเดอร์สร้างตารางโจทย์และฝังเฉลยลับของ Insertion Sort
+      const insertionBody = document.getElementById('insertionTableBody');
+      insertionBody.innerHTML = '';
+      answers.insertionPasses.forEach((pass, roundIdx) => {
+        const tr = document.createElement('tr');
+        let rowHtml = `<td class="p-2 border font-bold bg-slate-50">รอบที่ ${roundIdx + 1}</td>`;
+        pass.forEach((num, imgIdx) => {
+          const isGreen = imgIdx <= (roundIdx + 1) ? 'excel-green' : '';
+          rowHtml += `
+            <td class="p-1 border">
+              <input type="number" data-ans="${num}" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input ${isGreen} w-full p-1 text-center rounded outline-none font-medium" required>
+            </td>`;
+        });
+        tr.innerHTML = rowHtml;
+        insertionBody.appendChild(tr);
+      });
+    }
+
+    // ฟังก์ชันคำนวณสเต็ปการคัดแยก (Algorithm Simulation)
     function generateSortingAnswers(initialNumbers) {
-      // คำนวณคำตอบ Selection Sort (7 รอบ)
       let selectionPasses = [];
       let currentSel = [...initialNumbers];
       for (let i = 0; i < 7; i++) {
         let minIdx = i;
         for (let j = i + 1; j < currentSel.length; j++) {
-          if (currentSel[j] < currentSel[minIdx]) {
-            minIdx = j;
-          }
+          if (currentSel[j] < currentSel[minIdx]) { minIdx = j; }
         }
         let temp = currentSel[i];
         currentSel[i] = currentSel[minIdx];
@@ -199,7 +296,6 @@
         selectionPasses.push([...currentSel]);
       }
 
-      // คำนวณคำตอบ Insertion Sort (7 รอบ ตามตารางเดิม)
       let insertionPasses = [];
       let currentIns = [...initialNumbers];
       for (let i = 1; i < currentIns.length; i++) {
@@ -212,72 +308,10 @@
         currentIns[j + 1] = key;
         insertionPasses.push([...currentIns]);
       }
-
       return { selectionPasses, insertionPasses };
     }
 
-    // 3. ฟังก์ชัน Render หน้าตารางและนำชุดตัวเลขสุ่มไปใส่ไว้ในหน้าเว็บ
-    function initQuiz() {
-      const quizNumbers = generateRandomNumbers();
-      
-      // แสดงตัวเลขเริ่มต้นบนหน้าเว็บ
-      const container = document.getElementById('quizNumbersContainer');
-      container.innerHTML = '';
-      quizNumbers.forEach(num => {
-        const span = document.createElement('span');
-        span.className = "px-3 py-1.5 bg-white border border-blue-300 rounded font-bold text-slate-700 shadow-sm text-base";
-        span.innerText = num;
-        container.appendChild(span);
-      });
-
-      // ดึงคำตอบอาเรย์ในแต่ละรอบ
-      const answers = generateSortingAnswers(quizNumbers);
-
-      // สร้างตาราง Selection Sort (7 รอบ)
-      const selectionBody = document.getElementById('selectionTableBody');
-      selectionBody.innerHTML = '';
-      answers.selectionPasses.forEach((pass, roundIdx) => {
-        const tr = document.createElement('tr');
-        let rowHtml = `<td class="p-2 border font-bold bg-slate-50">รอบที่ ${roundIdx + 1}</td>`;
-        
-        pass.forEach((num, imgIdx) => {
-          // ดัชนีที่ได้รับการเรียงลำดับเสร็จแล้วในรอบนั้นๆ จะถูกไฮไลท์สีเขียว (เช่น รอบที่ 1 จัดเรียงดัชนี 0 เสร็จ)
-          const isGreen = imgIdx <= roundIdx ? 'excel-green' : '';
-          rowHtml += `
-            <td class="p-1 border">
-              <input type="number" data-ans="${num}" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input ${isGreen} w-full p-1 text-center rounded outline-none font-medium" required>
-            </td>`;
-        });
-        tr.innerHTML = rowHtml;
-        selectionBody.appendChild(tr);
-      });
-
-      // สร้างตาราง Insertion Sort (7 รอบ)
-      const insertionBody = document.getElementById('insertionTableBody');
-      insertionBody.innerHTML = '';
-      answers.insertionPasses.forEach((pass, roundIdx) => {
-        const tr = document.createElement('tr');
-        let rowHtml = `<td class="p-2 border font-bold bg-slate-50">รอบที่ ${roundIdx + 1}</td>`;
-        
-        pass.forEach((num, imgIdx) => {
-          // ส่วนทางซ้ายที่ได้รับการตรวจสอบและสับแทรกแล้วจะแสดงเป็นสีเขียว (รอบที่ 1 ตรวจสอบเสร็จถึงดัชนี 1)
-          const isGreen = imgIdx <= (roundIdx + 1) ? 'excel-green' : '';
-          rowHtml += `
-            <td class="p-1 border">
-              <input type="number" data-ans="${num}" oninput="startTimerOnFirstInput()" onchange="checkAnswerRealTime(this)" class="quiz-input ${isGreen} w-full p-1 text-center rounded outline-none font-medium" required>
-            </td>`;
-        });
-        tr.innerHTML = rowHtml;
-        insertionBody.appendChild(tr);
-      });
-    }
-
-    // เรียกทำงานการสร้างโจทย์เมื่อโหลดเพจ
-    window.addEventListener('DOMContentLoaded', initQuiz);
-
-
-    // --- ฟังก์ชันการทำงานของระบบกิจกรรมดั้งเดิม ---
-
+    // ตรวจสอบข้อมูลคำตอบแบบเรียลไทม์ตามเฉลยประจำตัว
     function checkAnswerRealTime(input) {
       const userValue = input.value.trim();
       const correctAnswer = input.getAttribute('data-ans');
@@ -291,87 +325,109 @@
         input.classList.remove('input-error');
       } else {
         input.classList.add('input-error');
-        alert(`❌ คำตอบยังไม่ถูกต้องค่ะ! กรุณาตรวจสอบและลองคำนวณใหม้อีกครั้งนะ`);
+        Swal.fire({
+          icon: 'error',
+          title: 'คำตอบยังไม่ถูกต้องค่ะ!',
+          text: 'ค่าประมวลผลรอบบุคคลของเลขที่นี้ไม่ตรงกับคำตอบของคุณ ลองตรวจสอบใหม่อีกครั้งนะ'
+        });
       }
     }
 
+    // เปิดการจับเวลาเมื่อกรอกตัวเลขช่องแรก
     function startTimerOnFirstInput() {
       if (!timerStarted) {
         timerStarted = true;
-        startTime = new Date();
         document.getElementById('timerContainer').classList.remove('hidden');
         timerInterval = setInterval(updateTimerDisplay, 1000);
       }
     }
 
     function updateTimerDisplay() {
-      if (!startTime) return;
-      const now = new Date();
-      const diffInSeconds = Math.floor((now - startTime) / 1000);
+      if (!liveTimerActive) return;
+      totalSeconds++;
       
-      const minutes = Math.floor(diffInSeconds / 60).toString().padStart(2, '0');
-      const seconds = (diffInSeconds % 60).toString().padStart(2, '0');
+      const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+      const seconds = (totalSeconds % 60).toString().padStart(2, '0');
       
       const timerDisplay = document.getElementById('timerDisplay');
       timerDisplay.innerText = `${minutes}:${seconds}`;
 
-      if (diffInSeconds >= 900) { 
-        timerDisplay.style.color = '#f59e0b';
-      }
-      if (diffInSeconds >= 1020) { 
-        timerDisplay.style.color = '#ef4444';
+      if (totalSeconds >= 900) { timerDisplay.style.color = '#f59e0b'; }
+      if (totalSeconds >= 1020) { timerDisplay.style.color = '#ef4444'; }
+    }
+
+    // ระบบความปลอดภัยลายนํ้าเบื้องต้น
+    function updateWatermark() {
+      const id = document.getElementById('studentId').value.trim();
+      const title = document.getElementById('title').value;
+      const name = document.getElementById('fullName').value.trim();
+      const layer = document.getElementById('watermarkLayer');
+      if (!layer) return;
+      if (!id || !title || !name) { layer.style.display = "none"; return; }
+      
+      layer.innerHTML = "";
+      layer.style.display = "block";
+      const fullText = `${title}${name} (${id})`;
+      const rows = 6; const cols = 3;
+      const containerWidth = document.getElementById('mainContainer').offsetWidth;
+      const containerHeight = document.getElementById('mainContainer').offsetHeight;
+
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          const txtNode = document.createElement('div');
+          txtNode.className = 'watermark-text';
+          txtNode.innerText = fullText;
+          txtNode.style.left = ((containerWidth / cols) * j + 25) + "px";
+          txtNode.style.top = ((containerHeight / rows) * i + 90) + "px";
+          layer.appendChild(txtNode);
+        }
       }
     }
 
+    // ระบบตรวจจับความปลอดภัยเมื่อหลุดโฟกัส (สลับแท็บ/ย่อจอ)
     document.addEventListener('visibilitychange', function() {
       if (document.hidden && timerStarted) {
+        liveTimerActive = false;
         cheatCount++;
-        alert(`⚠️ คำเตือนครั้งที่ ${cheatCount}: ห้ามเปลี่ยนแท็บหรือออกจากหน้าจอขณะทำกิจกรรมค่ะ!`);
+        document.getElementById("blurScreen").style.display = "flex";
       }
     });
 
+    document.getElementById("blurScreen").addEventListener("click", function() {
+      this.style.display = "none";
+      liveTimerActive = true;
+    });
+
+    // ประมวลผลและหักคะแนนตามเวลา
     function handleSubmit(event) {
       event.preventDefault();
       const submitBtn = document.getElementById('submitBtn');
       submitBtn.disabled = true;
-      submitBtn.innerText = "⏳ กำลังบันทึกข้อมูลลงฐานข้อมูล...";
+      submitBtn.innerText = "⏳ กำลังบันทึกข้อมูลเข้า Google Sheets...";
+
+      if (timerInterval) clearInterval(timerInterval);
 
       const inputs = document.querySelectorAll('.quiz-input');
       let totalQuestions = inputs.length;
       let correctAnswers = 0;
 
       inputs.forEach(input => {
-        if (input.value.trim() === input.getAttribute('data-ans')) {
-          correctAnswers++;
-        }
+        if (input.value.trim() === input.getAttribute('data-ans')) { correctAnswers++; }
       });
 
-      let minutesUsed = 0;
+      let minutesUsed = Math.floor(totalSeconds / 60);
       let penalty = 0;
 
-      if (timerStarted && startTime) {
-        clearInterval(timerInterval);
-        const endTime = new Date();
-        const timeDiffInSeconds = Math.floor((endTime - startTime) / 1000);
-        minutesUsed = timeDiffInSeconds / 60;
-
-        if (minutesUsed >= 25) {
-          penalty = 5;
-        } else if (minutesUsed >= 23) {
-          penalty = 4;
-        } else if (minutesUsed >= 21) {
-          penalty = 3;
-        } else if (minutesUsed >= 19) {
-          penalty = 2;
-        } else if (minutesUsed >= 17) {
-          penalty = 1;
-        } else {
-          penalty = 0;
-        }
+      if (timerStarted) {
+        if (minutesUsed >= 25) { penalty = 5; }
+        else if (minutesUsed >= 23) { penalty = 4; }
+        else if (minutesUsed >= 21) { penalty = 3; }
+        else if (minutesUsed >= 19) { penalty = 2; }
+        else if (minutesUsed >= 17) { penalty = 1; }
       }
 
       let finalScore = Math.max(0, correctAnswers - penalty);
-      let timeString = timerStarted ? `${Math.floor(minutesUsed)} นาที ${Math.floor((minutesUsed % 1) * 60)} วินาที` : "ไม่ได้เริ่มทำในตาราง";
+      let timeString = timerStarted ? `${minutesUsed} นาที ${totalSeconds % 60} วินาที` : "ไม่ได้เริ่มทำในตาราง";
       
       const formData = {
         studentId: document.getElementById('studentId').value,
@@ -387,6 +443,16 @@
         cheats: cheatCount
       };
 
+      const reportHtml = `
+        <div class="swal-report-box">
+          <div class="swal-report-line"><span>📝 ตอบถูกทั้งหมด:</span> <b>${correctAnswers} / ${totalQuestions} ช่อง</b></div>
+          <div class="swal-report-line"><span>⏳ เวลาที่ใช้ไปทั้งหมด:</span> <b>${timeString}</b></div>
+          <div class="swal-report-line" style="color: #c0392b;"><span>❌ คะแนนที่ถูกหักจากเวลา:</span> <b>-${penalty} คะแนน</b></div>
+          <div class="swal-report-line swal-report-total"><span>🎯 คะแนนสุทธิที่ได้:</span> <span>${finalScore} คะแนน</span></div>
+          ${cheatCount > 0 ? `<div class="swal-report-line mt-2 text-xs text-red-500 font-bold">⚠️ มีพฤติกรรมสลับหน้าจอ: ${cheatCount} ครั้ง</div>` : ''}
+        </div>
+      `;
+
       fetch(WEB_APP_URL, {
         method: "POST",
         mode: "no-cors",
@@ -394,22 +460,22 @@
         body: JSON.stringify(formData)
       })
       .then(() => {
-        let resultMessage = `🎉 บันทึกข้อมูลลง Google Sheet สำเร็จ!\n\n` +
-                            `📝 ตอบถูกทั้งหมด: ${correctAnswers} จาก ${totalQuestions} ช่อง\n` +
-                            `⏱️ เวลาที่ใช้ไป: ${timeString}\n` +
-                            `📉 ถูกหักคะแนนจากเวลา: -${penalty} คะแนน\n` +
-                            `📊 คะแนนสุทธิที่ได้: ${finalScore} คะแนน\n\n`;
-        
-        if (cheatCount > 0) {
-          resultMessage += `⚠️ หมายเหตุ: พบการเปลี่ยนแท็บ/ออกจากหน้าจอจำนวน ${cheatCount} ครั้ง`;
-        }
-
-        alert(resultMessage);
-        submitBtn.innerText = "✅ ส่งข้อมูลเรียบร้อยแล้ว";
+        Swal.fire({
+          icon: 'success',
+          title: 'ส่งคำตอบและบันทึกข้อมูลเรียบร้อย!',
+          html: reportHtml,
+          confirmButtonText: 'ตกลง',
+          allowOutsideClick: false
+        }).then((result) => {
+          if (result.isConfirmed) { location.reload(); }
+        });
       })
       .catch(error => {
-        alert("❌ เกิดข้อผิดพลาดในการส่งข้อมูลเข้าสู่คลาวด์ กรุณาแจ้งครูผู้สอนหรือบันทึกภาพหน้าจอผลลัพธ์นี้ไว้ครับ");
-        console.error(error);
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาดในการส่งข้อมูล',
+          text: 'กรุณาติดต่อคุณครูผู้สอนเพื่อรักษาสิทธิ์คะแนนประจำใบงานครับ'
+        });
         submitBtn.disabled = false;
         submitBtn.innerText = "ส่งคำตอบบันทึกข้อมูล";
       });
